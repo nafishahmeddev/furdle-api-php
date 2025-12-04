@@ -30,5 +30,8 @@ return function($router) {
             $router->post('', 'App\Controllers\EventController@index');
             $router->post('/{id}/attend', 'App\Controllers\EventController@attend');
         });
+
+        // Constants
+        $router->get('/constants', 'App\Controllers\ConstantsController@index');
     }, ['App\Middlewares\JsonMiddleware']);
 };
