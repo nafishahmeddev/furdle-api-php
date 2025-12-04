@@ -116,6 +116,9 @@ class AuthController
     // Generate new tokens
     $tokens = TokenHelper::generate($accessData['payload']);
 
+    //get new face token
+    $faceToken = FaceApiHelper::generateToken();
+
     $res->json([
       'code' => 'success',
       'message' => 'Token refreshed successfully',
@@ -123,7 +126,8 @@ class AuthController
         'tokens' => [
           'access' => $tokens['access'],
           'refresh' => $tokens['refresh']
-        ]
+        ],
+        'faceToken'=> $faceToken
       ]
     ]);
   }
