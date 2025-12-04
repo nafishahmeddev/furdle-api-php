@@ -36,7 +36,11 @@ class AuthController
     // Dummy validation (replace with real auth logic)
     if ($username === 'admin' && $password === 'password') {
       // Generate tokens
-      $tokens = TokenHelper::generate();
+      $tokens = TokenHelper::generate([
+        'id' => '123',
+        'name' => 'John Doe',
+        'email' => 'john.doe@example.com'
+      ]);
 
       $res->json([
         'code' => 'success',
