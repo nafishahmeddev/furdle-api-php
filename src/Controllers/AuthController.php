@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Helpers\TokenHelper;
 use App\Core\Request;
 use App\Core\Response;
+use App\Helpers\FaceApiHelper;
 
 /**
  * Auth Controller for handling authentication routes.
@@ -42,10 +43,7 @@ class AuthController
         'email' => 'john.doe@example.com'
       ]);
 
-      $faceTokens = [
-        "access" => rand(100000, 999999),
-        "refresh" => rand(10000000, 99999999),
-      ];
+      $faceTokens = FaceApiHelper::generateTokens();
 
       $res->json([
         'code' => 'success',
