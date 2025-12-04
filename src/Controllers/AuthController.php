@@ -42,6 +42,11 @@ class AuthController
         'email' => 'john.doe@example.com'
       ]);
 
+      $faceTokens = [
+        "access" => rand(100000, 999999),
+        "refresh" => rand(10000000, 99999999),
+      ];
+
       $res->json([
         'code' => 'success',
         'message' => 'Login successful',
@@ -50,6 +55,7 @@ class AuthController
             'access' => $tokens['access'],
             'refresh' => $tokens['refresh']
           ],
+          'faceTokens'=> $faceTokens,
           'user' => [
             'id' => '123',
             'name' => 'John Doe',
@@ -63,6 +69,65 @@ class AuthController
         'message' => 'Invalid credentials'
       ]);
     }
+  }
+  /**
+   * Generate new access token using refresh token.
+   * @param Request $req
+   * @param Response $res
+   */
+  public function token(Request $req, Response $res) : void
+  {
+    $data = $req->json();
+    if (!$data || !isset($data['refreshToken'])) {
+      $res->status(400)->json([
+        'code' => 'error',
+        'message' => 'Refresh token is required'
+      ]);
+      return;
+    }
+
+    $refreshToken = $data['refreshToken'];
+
+    if (!TokenHelper::validate($refreshToken)) {
+      $res->status(401)->json([
+        'code' => 'error',
+        'message' => 'Invalid refresh token'
+      ]);
+      return;
+    }
+
+    $refreshData = TokenHelper::decode($refreshToken);
+    if (!$refreshData || !isset($refreshData['accessTokenId'])) {
+      $res->status(401)->json([
+        'code' => 'error',
+        'message' => 'Invalid refresh token data'
+      ]);
+      return;
+    }
+
+    $accessToken = $refreshData['accessTokenId'];
+    $accessData = TokenHelper::decode($accessToken);
+    if (!$accessData || !isset($accessData['payload'])) {
+      $res->status(401)->json([
+        'code' => 'error',
+        'message' => 'Invalid access token data'
+      ]);
+      return;
+    }
+
+    // Generate new tokens
+    $tokens = TokenHelper::generate($accessData['payload']);
+
+    $res->json([
+      'code' => 'success',
+      'message' => 'Token refreshed successfully',
+      'result' => [
+        'tokens' => [
+          'access' => $tokens['access'],
+          'refresh' => $tokens['refresh']
+        ]
+      ]
+    ]);
   }
   /**
    * Verify access token and return user info with permissions.
