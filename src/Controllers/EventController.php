@@ -20,24 +20,6 @@ class EventController
      */
     public function index(Request $req, Response $res): void
     {
-        $authHeader = $req->header('Authorization');
-        if (!$authHeader) {
-            $res->status(401)->json([
-                'code' => 'error',
-                'message' => 'Authorization header required'
-            ]);
-            return;
-        }
-
-        // Validate token
-        if (!TokenHelper::validate($authHeader)) {
-            $res->status(401)->json([
-                'code' => 'error',
-                'message' => 'Invalid token'
-            ]);
-            return;
-        }
-
         // Dummy events data
         $records = [
             [

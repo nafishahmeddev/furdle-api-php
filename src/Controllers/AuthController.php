@@ -8,6 +8,7 @@ use App\Helpers\TokenHelper;
 use App\Core\Request;
 use App\Core\Response;
 use App\Helpers\FaceApiHelper;
+use stdClass;
 
 /**
  * Auth Controller for handling authentication routes.
@@ -53,7 +54,7 @@ class AuthController
             'access' => $tokens['access'],
             'refresh' => $tokens['refresh']
           ],
-          'faceToken'=> $faceToken,
+          'faceToken' => $faceToken,
           'user' => [
             'id' => '123',
             'name' => 'John Doe',
@@ -73,7 +74,7 @@ class AuthController
    * @param Request $req
    * @param Response $res
    */
-  public function token(Request $req, Response $res) : void
+  public function token(Request $req, Response $res): void
   {
     $data = $req->json();
     if (!$data || !isset($data['refreshToken'])) {
@@ -85,8 +86,9 @@ class AuthController
     }
 
     $refreshToken = $data['refreshToken'];
+    $refreshData = TokenHelper::decode($refreshToken);
 
-    if (!TokenHelper::validate($refreshToken)) {
+    if (!is_object($refreshData) || !isset($refreshData->accessToken)) {
       $res->status(401)->json([
         'code' => 'error',
         'message' => 'Invalid refresh token'
@@ -94,27 +96,20 @@ class AuthController
       return;
     }
 
-    $refreshData = TokenHelper::decode($refreshToken);
-    if (!$refreshData || !isset($refreshData['accessTokenId'])) {
+    $accessToken = $refreshData->accessToken;
+    if ($data["accessToken"] !== $accessToken) {
       $res->status(401)->json([
         'code' => 'error',
-        'message' => 'Invalid refresh token data'
+        'message' => 'Access token does not match refresh token'
       ]);
       return;
     }
-
-    $accessToken = $refreshData['accessTokenId'];
-    $accessData = TokenHelper::decode($accessToken);
-    if (!$accessData || !isset($accessData['payload'])) {
-      $res->status(401)->json([
-        'code' => 'error',
-        'message' => 'Invalid access token data'
-      ]);
-      return;
-    }
-
     // Generate new tokens
-    $tokens = TokenHelper::generate($accessData['payload']);
+    $tokens = TokenHelper::generate([
+      'id' => '123',
+      'name' => 'John Doe',
+      'email' => 'john.doe@example.com'
+    ]);
 
     //get new face token
     $faceToken = FaceApiHelper::generateToken();
@@ -127,7 +122,7 @@ class AuthController
           'access' => $tokens['access'],
           'refresh' => $tokens['refresh']
         ],
-        'faceToken'=> $faceToken
+        'faceToken' => $faceToken
       ]
     ]);
   }
@@ -139,7 +134,14 @@ class AuthController
    */
   public function verify(Request $req, Response $res): void
   {
-    $user = $req->auth["payload"];
+    $user = $req->auth;
+    if ($user === null) {
+      $res->status(401)->json([
+        'code' => 'error',
+        'message' => 'Unauthorized'
+      ]);
+      return;
+    }
     if (!$user) {
       $res->status(401)->json([
         'code' => 'error',

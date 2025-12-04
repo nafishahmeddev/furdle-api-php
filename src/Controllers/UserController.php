@@ -20,23 +20,6 @@ class UserController
      */
     public function lookup(Request $req, Response $res): void
     {
-        $authHeader = $req->header('Authorization');
-        if (!$authHeader) {
-            $res->status(401)->json([
-                'code' => 'error',
-                'message' => 'Authorization header required'
-            ]);
-            return;
-        }
-
-        // Validate token
-        if (!TokenHelper::validate($authHeader)) {
-            $res->status(401)->json([
-                'code' => 'error',
-                'message' => 'Invalid token'
-            ]);
-            return;
-        }
 
         $data = $req->json();
         if (!$data || !isset($data['type']) || !isset($data['code'])) {

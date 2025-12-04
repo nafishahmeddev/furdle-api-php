@@ -22,8 +22,8 @@ class Request
     public array $files;
     /** @var array<string, string|null> */
     public array $params = [];
-    /** @var array<string, mixed> */
-    public mixed $auth = null;
+    /** @var object|null */
+    public object|null $auth = null;
 
     public function __construct()
     {
