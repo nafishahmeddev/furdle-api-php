@@ -68,7 +68,7 @@ class AuthController
    */
   public function verify(Request $req, Response $res): void
   {
-    $user = $req->auth();
+    $user = $req->auth;
     if (!$user) {
       $res->status(401)->json([
         'code' => 'error',
