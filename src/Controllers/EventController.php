@@ -97,4 +97,34 @@ class EventController
             ]
         ]);
     }
+
+    /**
+     * Mark attendance for an event.
+     *
+     * @param Request $req
+     * @param Response $res
+     */
+    public function attend(Request $req, Response $res): void
+    {
+        $eventId = $req->param('id');
+
+        $data = $req->json();
+        if (!$data || !isset($data['payload']['studentId'])) {
+            $res->status(400)->json([
+                'code' => 'error',
+                'message' => 'Student ID is required in payload'
+            ]);
+            return;
+        }
+
+        $studentId = $data['payload']['studentId'];
+
+        // Dummy attendance logic (e.g., save to database)
+        // Here you would validate the event exists, student exists, etc.
+
+        $res->json([
+            'code' => 'success',
+            'message' => 'successful'
+        ]);
+    }
 }
