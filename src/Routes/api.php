@@ -17,7 +17,7 @@ return function ($router) {
             $router->post('/login', 'App\Controllers\AuthController@login');
             
             // add auth middleware 
-            $router->post('/verify', 'App\Controllers\AuthController@verify', ["App\Middlewares\AuthMiddleware"]);
+            $router->get('/verify', 'App\Controllers\AuthController@verify', ["App\Middlewares\AuthMiddleware"]);
             $router->post('/validate-password', 'App\Controllers\AuthController@validatePassword', ['App\Middlewares\AuthMiddleware']);
         });
 
