@@ -30,6 +30,13 @@ class AuthMiddleware implements Middleware
       return;
     }
 
+    // Set auth data (dummy for now, in real app decode token to get user data)
+    $req->auth = [
+      'user_id' => '123',
+      'name' => 'John Doe',
+      'email' => 'john.doe@example.com'
+    ];
+
     $next();
   }
 }

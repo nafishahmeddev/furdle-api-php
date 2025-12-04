@@ -22,6 +22,8 @@ class Request
     public array $files;
     /** @var array<string, string|null> */
     public array $params = [];
+    /** @var array<string, mixed> */
+    public array $auth = [];
 
     public function __construct()
     {
@@ -108,22 +110,5 @@ class Request
     public function allFiles(): array
     {
         return $this->files;
-    }
-
-    /**
-     * Get authenticated user data from token.
-     *
-     * @return array|null
-     */
-    public function auth(): ?array
-    {
-        $authHeader = $this->header('Authorization');
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return null;
-        }
-
-        $token = substr($authHeader, 7); // Remove 'Bearer '
-
-        return TokenHelper::decode($token);
     }
 }
