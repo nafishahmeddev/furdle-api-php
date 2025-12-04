@@ -18,7 +18,7 @@ class FaceApiHelper
    * @param string|null $bearerToken
    * @return array|null
    */
-  public static function generateTokens(): ?array
+  public static function generateToken(): string|null
   {
     $data = json_encode(['code' => 'ORG1']);
 
@@ -44,8 +44,8 @@ class FaceApiHelper
       if ($httpCode === 200 && $response) {
         $decoded = json_decode($response, true);
         if(isset($decoded['result'])) {
-          if(isset($decoded['result']['tokens'])) {
-            return $decoded['result']['tokens'];
+          if(isset($decoded['result']['token'])) {
+            return $decoded['result']['token'];
           }
         }
       }

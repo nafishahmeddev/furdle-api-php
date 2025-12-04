@@ -43,7 +43,7 @@ class AuthController
         'email' => 'john.doe@example.com'
       ]);
 
-      $faceTokens = FaceApiHelper::generateTokens();
+      $faceToken = FaceApiHelper::generateToken();
 
       $res->json([
         'code' => 'success',
@@ -53,7 +53,7 @@ class AuthController
             'access' => $tokens['access'],
             'refresh' => $tokens['refresh']
           ],
-          'faceTokens'=> $faceTokens,
+          'faceToken'=> $faceToken,
           'user' => [
             'id' => '123',
             'name' => 'John Doe',
