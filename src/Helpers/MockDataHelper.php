@@ -10,7 +10,7 @@ class MockDataHelper
 {
     private static array $users = [
         [
-            'id' => '00001',
+            'id' => '1',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'type' => 'student',
@@ -21,7 +21,7 @@ class MockDataHelper
             'created_at' => '2024-01-15 10:30:00'
         ],
         [
-            'id' => '00002',
+            'id' => '2',
             'name' => 'Jane Smith',
             'email' => 'jane.smith@example.com',
             'type' => 'student',
@@ -32,7 +32,7 @@ class MockDataHelper
             'created_at' => '2024-01-16 11:45:00'
         ],
         [
-            'id' => '00003',
+            'id' => '3',
             'name' => 'Mike Johnson',
             'email' => 'mike.johnson@example.com',
             'type' => 'staff',
@@ -43,7 +43,7 @@ class MockDataHelper
             'created_at' => '2024-01-17 09:15:00'
         ],
         [
-            'id' => '00004',
+            'id' => '4',
             'name' => 'Sarah Wilson',
             'email' => 'sarah.wilson@example.com',
             'type' => 'student',
@@ -54,7 +54,7 @@ class MockDataHelper
             'created_at' => '2024-01-18 14:20:00'
         ],
         [
-            'id' => '00005',
+            'id' => '5',
             'name' => 'David Brown',
             'email' => 'david.brown@example.com',
             'type' => 'staff',
@@ -191,10 +191,10 @@ class MockDataHelper
      * @param string $id
      * @return array|null
      */
-    public static function getUserById(string $id): ?array
+    public static function getUserById(string $id, $type): ?array
     {
         foreach (self::$users as $user) {
-            if ($user['id'] === $id) {
+            if ($user['id'] === $id && $user['type'] === $type) {
                 return $user;
             }
         }
@@ -235,43 +235,6 @@ class MockDataHelper
     public static function getAuthUser(): array
     {
         return self::$authUser;
-    }
-
-    /**
-     * Generate a single mock user for lookup.
-     *
-     * @param string $type
-     * @param string $code
-     * @return array
-     */
-    public static function generateUserLookup(string $type, string $code): array
-    {
-        // Try to find existing user first
-        $existingUser = self::getUserById(str_pad($code, 5, '0', STR_PAD_LEFT));
-        if ($existingUser) {
-            return [
-                'id' => $existingUser['id'],
-                'name' => $existingUser['name'],
-                'description' => "type: {$type}, Session: {$existingUser['session']}, class: {$existingUser['class']}",
-                'facePayload' => [
-                    'formNo' => (int)$code,
-                    'session' => (int)$existingUser['session'],
-                    'class' => (int)$existingUser['class']
-                ]
-            ];
-        }
-
-        // Fallback to generated user
-        return [
-            'id' => str_pad($code, 5, '0', STR_PAD_LEFT),
-            'name' => 'Generated User',
-            'description' => "type: {$type}, Session: 2025, class: 5",
-            'facePayload' => [
-                'formNo' => (int)$code,
-                'session' => 2025,
-                'class' => 5
-            ]
-        ];
     }
 
     /**

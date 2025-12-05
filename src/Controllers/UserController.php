@@ -33,7 +33,14 @@ class UserController
         $type = $data['type'];
         $code = $data['code'];
 
-        $user = MockDataHelper::generateUserLookup($type, $code);
+        $user = MockDataHelper::getUserById($code, $type);
+        if (!$user) {
+            $res->status(404)->json([
+                'code' => 'error',
+                'message' => 'User not found'
+            ]);
+            return;
+        }
 
         $res->json(MockDataHelper::apiResponse([
             'user' => $user

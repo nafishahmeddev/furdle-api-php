@@ -50,7 +50,7 @@ class EventController
         $studentId = $data['payload']['studentId'];
 
         // Check if user exists in static data
-        $user = MockDataHelper::getUserById($studentId);
+        $user = MockDataHelper::getUserById($studentId, "student");
 
         if (!$user) {
             $res->status(404)->json([
