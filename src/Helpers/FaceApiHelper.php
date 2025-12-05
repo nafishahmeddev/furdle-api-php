@@ -37,7 +37,7 @@ class FaceApiHelper
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    // curl_close($ch); // Not needed in PHP 8+, resources are auto-cleaned
+    curl_close($ch); // Not needed in PHP 8+, resources are auto-cleaned
 
     try {
       $data = null;
