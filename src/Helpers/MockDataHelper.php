@@ -183,15 +183,15 @@ class MockDataHelper
     {
         return [
             [
-                "key" => "student",
+                "value" => "student",
                 "label" => "Student"
             ],
             [
-                "key" => "staff",
+                "value" => "staff",
                 "label" => "Staff"
             ],
             [
-                "key" => "admission",
+                "value" => "admission",
                 "label" => "Admission"
             ]
         ];
