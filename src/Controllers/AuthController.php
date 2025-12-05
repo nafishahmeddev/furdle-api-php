@@ -166,26 +166,6 @@ class AuthController
    */
   public function validatePassword(Request $req, Response $res): void
   {
-    $authHeader = $req->header('Authorization');
-    if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-      $res->status(401)->json([
-        'code' => 'error',
-        'message' => 'Valid Bearer token required'
-      ]);
-      return;
-    }
-
-    $token = substr($authHeader, 7); // Remove 'Bearer '
-
-    // Dummy token validation
-    if (strlen($token) < 10) {
-      $res->status(401)->json([
-        'code' => 'error',
-        'message' => 'Invalid token'
-      ]);
-      return;
-    }
-
     $data = $req->json();
     if (!$data || !isset($data['password'])) {
       $res->status(400)->json([
@@ -204,7 +184,7 @@ class AuthController
         'message' => 'User is valid'
       ]);
     } else {
-      $res->status(401)->json([
+      $res->status(400)->json([
         'code' => 'error',
         'message' => 'Invalid password'
       ]);

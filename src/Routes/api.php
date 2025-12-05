@@ -15,6 +15,7 @@ return function ($router) {
         // Auth subgroup
         $router->group('/auth', function ($router) {
             $router->post('/login', 'App\Controllers\AuthController@login');
+            $router->post('/token','App\Controllers\AuthController@token');
             
             // add auth middleware 
             $router->get('/verify', 'App\Controllers\AuthController@verify', ["App\Middlewares\AuthMiddleware"]);
