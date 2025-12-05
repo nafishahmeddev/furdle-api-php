@@ -9,7 +9,7 @@ namespace App\Helpers;
  */
 class FaceApiHelper
 {
-  private const API_URL = 'https://face.nafish.me/api/rest/client-token';
+  private const API_URL = 'http://localhost:3000/api/rest/client-token';
 
   /**
    * Generate client token from Face API.
