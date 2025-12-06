@@ -50,7 +50,7 @@ class UserController
         $user = null;
         if ($type == "staff") {
             $admin = DbHelper::selectOne("SELECT * FROM admin WHERE adminId=?", [$code]);
-            if ($admin) {
+            if ($admin != null) {
                 $user = [
                     'code' => (string) $admin['adminId'],
                     'name' => $admin["name"],
@@ -61,6 +61,31 @@ class UserController
                         "branch" => $admin["branch_code"],
                     ]
                 ];
+            }
+        } else if ($type == "student") {
+            $student = DbHelper::selectOne("SELECT * FROM student WHERE registerNo=? LIMIT 1", [$code]);
+            if ($student != null) {
+                $history = DbHelper::selectOne("SELECT * FROM history WHERE studentId=? ORDER BY asession DESC LIMIT 1", [$student['studentId']]);
+                if ($history != null) {
+                    $code = (string) $student['registerNo'];
+                    $branch = (string) $student['branch'];
+                    $session = (string) $history['asession'];
+                    $class = (string) $history['class'];
+                    $board = (string) $history['board'];
+                    $description = "Student from branch {$branch}, session {$session}, class {$class}, board {$board}";
+                    $user = [
+                        'code' => $code,
+                        'name' => $student["name"],
+                        "description" => $description,
+                        "facePayload" => [
+                            "code" => $code,
+                            "type" => "student",
+                            "branch" => $branch,
+                            "session" => $session,
+                            "class" => $class
+                        ]
+                    ];
+                }
             }
         } else {
             //TODO: fetch from real database
