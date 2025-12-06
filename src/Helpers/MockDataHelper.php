@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Helpers;
@@ -217,7 +218,17 @@ class MockDataHelper
     {
         foreach (self::$users as $user) {
             if ($user['id'] === $id && $user['type'] === $type) {
-                return $user;
+                return [
+                    "id" => $user['id'],
+                    "name" => $user['name'],
+                    "description" => "{$user['type']} from branch {$user['branch']}, session {$user['session']}, class {$user['class']}",
+                    "facePayload" => [
+                        "type" => $user['type'],
+                        "branch" => $user['branch'],
+                        "session" => $user['session'],
+                        "class" => $user['class']
+                    ]
+                ];
             }
         }
         return null;
