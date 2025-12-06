@@ -71,10 +71,10 @@ class Logger
 
         // Custom line formatter
         $formatter = new LineFormatter(
-            "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n",
+            "[%datetime%] %channel%.%level_name%: %message%\n%context%\n%extra%\n",
             'Y-m-d H:i:s',
             true, // Allow inline line breaks
-            true  // Ignore empty context
+            false  // Don't ignore empty context to show pretty formatting
         );
         $fileHandler->setFormatter($formatter);
 
