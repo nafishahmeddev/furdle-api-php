@@ -34,7 +34,7 @@ class UserController
             ],
             [
                 "value" => "staff",
-                "label" => "Staff"
+                "label" => "Employee"
             ]
         ];
 
