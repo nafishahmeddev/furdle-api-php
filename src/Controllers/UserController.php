@@ -26,7 +26,7 @@ class UserController
         $res->json(MockDataHelper::apiResponse(["types" => $types], 'User types retrieved successfully'));
     }
     /**
-     * Lookup user by type and code.
+     * Lookup user by type and id.
      *
      * @param Request $req
      * @param Response $res
@@ -34,10 +34,10 @@ class UserController
     public function lookup(Request $req, Response $res): void
     {
         $data = $req->json();
-        if (!$data || !isset($data['type']) || !isset($data['code'])) {
+        if (!$data || !isset($data['type']) || !isset($data['id'])) {
             $res->status(400)->json([
                 'code' => 'error',
-                'message' => 'Type and code are required'
+                'message' => 'Type and id are required'
             ]);
             return;
         }
@@ -45,7 +45,7 @@ class UserController
         $type = $data['type'];
         $code = $data['code'];
 
-        $user = MockDataHelper::getUserById($code, $type);
+        $user = MockDataHelper::getUserByCode($code, $type);
         if (!$user) {
             $res->status(404)->json([
                 'code' => 'error',
@@ -57,37 +57,5 @@ class UserController
         $res->json(MockDataHelper::apiResponse([
             'user' => $user
         ]));
-    }
-
-    /**
-     * Register user with face ID.
-     *
-     * @param Request $req
-     * @param Response $res
-     */
-    public function register(Request $req, Response $res): void
-    {
-        $data = $req->json();
-        if (!$data || !isset($data['type']) || !isset($data['code']) || !isset($data['faceId'])) {
-            $res->status(400)->json([
-                'code' => 'error',
-                'message' => 'Type, code, and faceId are required'
-            ]);
-            return;
-        }
-
-        $type = $data['type'];
-        $code = $data['code'];
-        $faceId = $data['faceId'];
-
-        // Simulate registration with mock data
-        $result = [
-            'type' => $type,
-            'faceId' => $faceId,
-            'code' => $code,
-            'registered_at' => date('Y-m-d H:i:s')
-        ];
-
-        $res->json(MockDataHelper::apiResponse($result, 'User registered successfully'));
     }
 }

@@ -37,5 +37,11 @@ return function ($router) {
 
         // Constants
         $router->get('/constants', 'App\Controllers\ConstantsController@index', ['App\Middlewares\AuthMiddleware']);
+
+        // Webhooks (no auth required for external services)
+        $router->group('/webhooks', function ($router) {
+            $router->post('/face-recognition', 'App\Controllers\WebhookController@faceRecognition');
+            $router->post('/generic', 'App\Controllers\WebhookController@generic');
+        });
     }, ['App\Middlewares\JsonMiddleware', 'App\Middlewares\LoggingMiddleware']);
 };

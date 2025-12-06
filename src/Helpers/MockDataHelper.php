@@ -11,65 +11,60 @@ class MockDataHelper
 {
     private static array $users = [
         [
-            'id' => '1',
+            'code' => '1',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'type' => 'student',
             'branch' => 'XFM1000231',
             'session' => '2025',
             'class' => '5',
-            'faceId' => 'face_67890',
             'created_at' => '2024-01-15 10:30:00'
         ],
         [
-            'id' => '2',
+            'code' => '2',
             'name' => 'Jane Smith',
             'email' => 'jane.smith@example.com',
             'type' => 'student',
             'branch' => 'XFM1000231',
             'session' => '2025',
             'class' => '5',
-            'faceId' => 'face_67891',
             'created_at' => '2024-01-16 11:45:00'
         ],
         [
-            'id' => '3',
+            'code' => '3',
             'name' => 'Mike Johnson',
             'email' => 'mike.johnson@example.com',
             'type' => 'staff',
             'branch' => 'XFM1000231',
             'session' => '2025',
             'class' => '5',
-            'faceId' => 'face_67892',
             'created_at' => '2024-01-17 09:15:00'
         ],
         [
-            'id' => '4',
+            'code' => '4',
             'name' => 'Sarah Wilson',
             'email' => 'sarah.wilson@example.com',
             'type' => 'student',
             'branch' => 'XFM1000232',
             'session' => '2025',
             'class' => '6',
-            'faceId' => 'face_67893',
             'created_at' => '2024-01-18 14:20:00'
         ],
         [
-            'id' => '5',
+            'code' => '5',
             'name' => 'David Brown',
             'email' => 'david.brown@example.com',
             'type' => 'staff',
             'branch' => 'XFM1000232',
             'session' => '2025',
             'class' => '6',
-            'faceId' => 'face_67894',
             'created_at' => '2024-01-19 16:30:00'
         ]
     ];
 
     private static array $events = [
         [
-            'id' => '1',
+            'code' => '1',
             'name' => 'Mathematics',
             'description' => 'A branch of science concerned with the properties and relations of numbers and quantities and shapes.',
             'facePayload' => [
@@ -82,7 +77,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '2',
+            'code' => '2',
             'name' => 'Admission 2025',
             'description' => 'Information regarding the admission process for the year 2025.',
             'facePayload' => [
@@ -94,7 +89,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '3',
+            'code' => '3',
             'name' => 'Staff (Branch Only)',
             'description' => 'Staff meeting for XFM1000231 branch.',
             'facePayload' => [
@@ -105,7 +100,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '4',
+            'code' => '4',
             'name' => 'Staff (Global)',
             'description' => 'General announcements for all students and staff.',
             'facePayload' => [
@@ -115,7 +110,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '5',
+            'code' => '5',
             'name' => 'Mathematics (All Students)',
             'description' => 'Mathematics class for all students in session 2025.',
             'facePayload' => [
@@ -127,7 +122,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '6',
+            'code' => '6',
             'name' => 'Physics Class 6',
             'description' => 'Physics class for grade 6 students.',
             'facePayload' => [
@@ -140,7 +135,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '7',
+            'code' => '7',
             'name' => 'Chemistry Lab',
             'description' => 'Chemistry laboratory session for students.',
             'facePayload' => [
@@ -152,7 +147,7 @@ class MockDataHelper
             'is_active' => true
         ],
         [
-            'id' => '8',
+            'code' => '8',
             'name' => 'Staff Meeting XFM1000232',
             'description' => 'Branch-specific staff meeting.',
             'facePayload' => [
@@ -172,7 +167,6 @@ class MockDataHelper
         'branch' => 'XFM1000231',
         'session' => '2025',
         'class' => '0',
-        'faceId' => 'face_admin',
         'created_at' => '2024-01-01 00:00:00'
     ];
 
@@ -214,12 +208,12 @@ class MockDataHelper
      * @param string $id
      * @return array|null
      */
-    public static function getUserById(string $id, $type): ?array
+    public static function getUserByCode(string $code, $type): ?array
     {
         foreach (self::$users as $user) {
-            if ($user['id'] === $id && $user['type'] === $type) {
+            if ($user['code'] === $code && $user['type'] === $type) {
                 return [
-                    "id" => $user['id'],
+                    "code" => $user['code'],
                     "name" => $user['name'],
                     "description" => "{$user['type']} from branch {$user['branch']}, session {$user['session']}, class {$user['class']}",
                     "facePayload" => [

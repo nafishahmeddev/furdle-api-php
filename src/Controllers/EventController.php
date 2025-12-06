@@ -27,39 +27,4 @@ class EventController
             'records' => $events
         ], 'Attendance list retrieved successfully'));
     }
-
-    /**
-     * Mark attendance for an event.
-     *
-     * @param Request $req
-     * @param Response $res
-     */
-    public function attend(Request $req, Response $res): void
-    {
-        $eventId = $req->param('id');
-
-        $data = $req->json();
-        if (!$data || !isset($data['payload']['studentId'])) {
-            $res->status(400)->json([
-                'code' => 'error',
-                'message' => 'Student ID is required in payload'
-            ]);
-            return;
-        }
-
-        $studentId = $data['payload']['studentId'];
-
-        // Check if user exists in static data
-        $user = MockDataHelper::getUserById($studentId, "student");
-
-        if (!$user) {
-            $res->status(404)->json([
-                'code' => 'error',
-                'message' => 'Student not found'
-            ]);
-            return;
-        }
-
-        $res->json(MockDataHelper::apiResponse(null, 'Attendance marked successfully'));
-    }
 }
