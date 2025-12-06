@@ -28,16 +28,24 @@ class AuthMiddleware implements Middleware
 
     $token = substr($authHeader, 7); // Remove 'Bearer '
 
-    $decoded = TokenHelper::decode($token);
-    if (!is_object($decoded) || !property_exists($decoded, 'user')) {
+    try {
+      $decoded = TokenHelper::decode($token);
+      if (!is_object($decoded) || !property_exists($decoded, 'user')) {
+        $res->status(401)->json([
+          'code' => 'error',
+          'message' => 'Invalid token'
+        ]);
+        return;
+      }
+      $req->auth = $decoded->user;
+
+      $next();
+    } catch (\Exception $e) {
       $res->status(401)->json([
         'code' => 'error',
-        'message' => 'Invalid token'
+        'message' => 'Invalid token: ' . $e->getMessage()
       ]);
       return;
     }
-    $req->auth = $decoded->user;
-
-    $next();
   }
 }
