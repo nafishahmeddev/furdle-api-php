@@ -20,7 +20,6 @@ class TokenHelper
    */
   private static function getSecretKey(): string
   {
-    Logger::info("SCERET IS ".getenv('JWT_SECRET'));
     return getenv('JWT_SECRET') ?: 'your-secret-key-here-change-in-production';
   }
 
