@@ -48,8 +48,8 @@ class AuthController
     // Prepare user data for token
     $user  = [
       "id" => (string) $admin['adminId'],
-      "name"=> $admin["name"],
-      "username"=> $admin["username"]
+      "name" => $admin["name"],
+      "username" => $admin["username"]
     ];
 
     // Generate tokens
@@ -120,9 +120,9 @@ class AuthController
     }
     // Generate new tokens with static auth user data
     $user = [
-      'id'=> (string) $admin['adminId'],
-      'name'=> $admin["name"],
-      "username"=> $admin["username"]
+      'id' => (string) $admin['adminId'],
+      'name' => $admin["name"],
+      "username" => $admin["username"]
     ];
     $tokens = TokenHelper::generate($user);
 
@@ -150,23 +150,8 @@ class AuthController
   public function verify(Request $req, Response $res): void
   {
     $user = $req->auth;
-    if ($user === null) {
-      $res->status(401)->json([
-        'code' => 'error',
-        'message' => 'Unauthorized'
-      ]);
-      return;
-    }
-    if (!$user) {
-      $res->status(401)->json([
-        'code' => 'error',
-        'message' => 'Invalid token'
-      ]);
-      return;
-    }
-
     //fetch user from database
-    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=?',[$user->id]);
+    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=?', [$user->id]);
     if ($admin == null) {
       $res->status(401)->json([
         'code' => 'error',
@@ -176,9 +161,9 @@ class AuthController
     }
 
     $user = [
-      'id'=> (string) $admin['adminId'],
-      'name'=> $admin["name"],
-      "username"=> $admin["username"]
+      'id' => (string) $admin['adminId'],
+      'name' => $admin["name"],
+      "username" => $admin["username"]
     ];
 
 
@@ -213,17 +198,20 @@ class AuthController
 
     $password = $data['password'];
 
-    // Dummy password validation (e.g., check against user's stored password)
-    if ($password === '12345678') {
-      $res->json([
-        'code' => 'success',
-        'message' => 'User is valid'
-      ]);
-    } else {
-      $res->status(400)->json([
+    $user = $req->auth;
+    //fetch user from database
+    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=? AND password=?', [$user->id, $password]);
+    if ($admin == null) {
+      $res->status(401)->json([
         'code' => 'error',
         'message' => 'Invalid password'
       ]);
+      return;
     }
+
+    $res->json([
+      'code' => 'success',
+      'message' => 'Password validated successfully'
+    ]);
   }
 }
