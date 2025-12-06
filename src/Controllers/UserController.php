@@ -49,7 +49,7 @@ class UserController
         //for admin call database
         $user = null;
         if ($type == "staff") {
-            $admin = DbHelper::selectOne("SELECT * FROM admin WHERE adminId=? LIMIT 1", [$code]);
+            $admin = DbHelper::selectOne("SELECT name, adminId, username, branch_code FROM admin WHERE adminId=? LIMIT 1", [$code]);
             if ($admin != null) {
                 $dynamicFields = [];
                 $dynamicFields[] = ["label" => "Admin ID", "value" => (string) $admin["adminId"]];
@@ -68,9 +68,9 @@ class UserController
                 ];
             }
         } else if ($type == "student") {
-            $student = DbHelper::selectOne("SELECT * FROM student WHERE registerNo=? LIMIT 1", [$code]);
+            $student = DbHelper::selectOne("SELECT name, registerNo, branch, studentId FROM student WHERE registerNo=? LIMIT 1", [$code]);
             if ($student != null) {
-                $history = DbHelper::selectOne("SELECT * FROM history WHERE studentId=? ORDER BY asession DESC LIMIT 1", [$student['studentId']]);
+                $history = DbHelper::selectOne("SELECT asession, class, board FROM history WHERE studentId=? ORDER BY asession DESC LIMIT 1", [$student['studentId']]);
                 if ($history != null) {
                     $code = (string) $student['registerNo'];
                     $branch = (string) $student['branch'];
@@ -107,13 +107,6 @@ class UserController
                 "name"=> $user["name"],
                 "code"=> $code,
             ];
-            if (!$user) {
-                $res->status(404)->json([
-                    'code' => 'error',
-                    'message' => 'User not found'
-                ]);
-                return;
-            }
         }
 
         if (!$user) {
