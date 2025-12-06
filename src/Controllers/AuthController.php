@@ -49,7 +49,7 @@ class AuthController
 
     // Prepare user data for token
     $user  = [
-      "id" => $admin['adminId'],
+      "id" => (string) $admin['adminId'],
       "name"=> $admin["name"],
       "username"=> $admin["username"]
     ];
@@ -122,7 +122,7 @@ class AuthController
     }
     // Generate new tokens with static auth user data
     $user = [
-      'id'=> $admin['adminId'],
+      'id'=> (string) $admin['adminId'],
       'name'=> $admin["name"],
       "username"=> $admin["username"]
     ];
@@ -178,7 +178,7 @@ class AuthController
     }
 
     $user = [
-      'id'=> $admin['adminId'],
+      'id'=> (string) $admin['adminId'],
       'name'=> $admin["name"],
       "username"=> $admin["username"]
     ];
