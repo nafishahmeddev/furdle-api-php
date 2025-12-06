@@ -9,7 +9,25 @@ namespace App\Helpers;
  */
 class FaceApiHelper
 {
-  private const API_URL = 'https://face.nafish.me/api/rest/client-token';
+  /**
+   * Get Face API URL from environment.
+   *
+   * @return string
+   */
+  private static function getApiUrl(): string
+  {
+    return getenv('FACE_API_URL') ?: 'https://face.nafish.me/api/rest/client-token';
+  }
+
+  /**
+   * Get Face API Token from environment.
+   *
+   * @return string
+   */
+  private static function getApiToken(): string
+  {
+    return getenv('FACE_API_TOKEN') ?: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoicmVzdCIsIm9yZyI6eyJjb2RlIjoiT1JHMSJ9LCJpYXQiOjE3NjQ5MTczODN9.o2HLf6_CVTGK6a4pkgcQd4rnFBoP8xfTXLj97MTuyn4';
+  }
 
   /**
    * Generate client token from Face API.
@@ -26,10 +44,10 @@ class FaceApiHelper
       'Content-Type: application/json',
       'Content-Length: ' . strlen($data)
     ];
-    $token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoicmVzdCIsIm9yZyI6eyJjb2RlIjoiT1JHMSJ9LCJpYXQiOjE3NjQ5MTczODN9.o2HLf6_CVTGK6a4pkgcQd4rnFBoP8xfTXLj97MTuyn4";
+    $token = self::getApiToken();
     $headers[] = "Authorization: Bearer $token";
 
-    $ch = curl_init(self::API_URL);
+    $ch = curl_init(self::getApiUrl());
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);

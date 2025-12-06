@@ -9,6 +9,9 @@ declare(strict_types=1);
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Load environment variables
+use App\Helpers\EnvHelper;
+EnvHelper::load(__DIR__ . '/.env');
 
 use App\Core\AutoRouter;
 

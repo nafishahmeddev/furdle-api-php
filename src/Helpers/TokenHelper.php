@@ -13,8 +13,35 @@ use stdClass;
  */
 class TokenHelper
 {
-  private const SECRET_KEY = 'your-secret-key-here-change-in-production';
-  private const ALGORITHM = 'HS256';
+  /**
+   * Get JWT secret key from environment.
+   *
+   * @return string
+   */
+  private static function getSecretKey(): string
+  {
+    return getenv('JWT_SECRET') ?: 'your-secret-key-here-change-in-production';
+  }
+
+  /**
+   * Get JWT algorithm from environment.
+   *
+   * @return string
+   */
+  private static function getAlgorithm(): string
+  {
+    return getenv('JWT_ALGORITHM') ?: 'HS256';
+  }
+
+  /**
+   * Get JWT expiry time from environment.
+   *
+   * @return int
+   */
+  private static function getExpiry(): int
+  {
+    return (int)(getenv('JWT_EXPIRY') ?: 3600);
+  }
 
   /**
    * Generate access and refresh tokens.
@@ -24,28 +51,29 @@ class TokenHelper
    */
   public static function generate(array $payload): array
   {
+    $expiry = self::getExpiry();
     $accessPayload = [
       'iss' => 'your-app',
       'aud' => 'your-app-users',
       'iat' => time(),
-      'exp' => time() + 86400, // 24 hour
+      'exp' => time() + $expiry, // From environment
       'type' => 'access',
       'user' => $payload
     ];
 
-    $accessToken = JWT::encode($accessPayload, self::SECRET_KEY, self::ALGORITHM);
+    $accessToken = JWT::encode($accessPayload, self::getSecretKey(), self::getAlgorithm());
 
     $refreshPayload = [
       'iss' => 'your-app',
       'aud' => 'your-app-users',
       'iat' => time(),
-      'exp' => time() + 604800, // 1 week
+      'exp' => time() + ($expiry * 7), // 7x access token expiry
       'type' => 'refresh',
       "accessToken" => $accessToken
     ];
 
 
-    $refreshToken = JWT::encode($refreshPayload, self::SECRET_KEY, self::ALGORITHM);
+    $refreshToken = JWT::encode($refreshPayload, self::getSecretKey(), self::getAlgorithm());
 
     return [
       'access' => $accessToken,
@@ -61,6 +89,6 @@ class TokenHelper
    */
   public static function decode(string $token): stdClass
   {
-    return JWT::decode($token, new Key(self::SECRET_KEY, self::ALGORITHM));
+    return JWT::decode($token, new Key(self::getSecretKey(), self::getAlgorithm()));
   }
 }
