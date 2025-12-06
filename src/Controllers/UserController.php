@@ -49,7 +49,7 @@ class UserController
         //for admin call database
         $user = null;
         if ($type == "staff") {
-            $admin = DbHelper::selectOne("SELECT * FROM admin WHERE adminId=?", [$code]);
+            $admin = DbHelper::selectOne("SELECT * FROM admin WHERE adminId=? LIMIT 1", [$code]);
             if ($admin != null) {
                 $dynamicFields = [];
                 $dynamicFields[] = ["label" => "Admin ID", "value" => (string) $admin["adminId"]];
