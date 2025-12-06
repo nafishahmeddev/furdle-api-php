@@ -51,6 +51,7 @@ class AuthController
     $user  = [
       "id" => $admin['adminId'],
       "name"=> $admin["name"],
+      "username"=> $admin["username"]
     ];
 
     // Generate tokens
@@ -110,8 +111,21 @@ class AuthController
       ]);
       return;
     }
+    // fetch user data from database or other source
+    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=?', [$refreshData->user->id]);
+    if ($admin == null) {
+      $res->status(401)->json([
+        'code' => 'error',
+        'message' => 'User not found'
+      ]);
+      return;
+    }
     // Generate new tokens with static auth user data
-    $user = \App\Helpers\MockDataHelper::getAuthUser();
+    $user = [
+      'id'=> $admin['adminId'],
+      'name'=> $admin["name"],
+      "username"=> $admin["username"]
+    ];
     $tokens = TokenHelper::generate($user);
 
     //get new face token
@@ -152,6 +166,23 @@ class AuthController
       ]);
       return;
     }
+
+    //fetch user from database
+    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=?',[$user->id]);
+    if ($admin == null) {
+      $res->status(401)->json([
+        'code' => 'error',
+        'message' => 'User not found'
+      ]);
+      return;
+    }
+
+    $user = [
+      'id'=> $admin['adminId'],
+      'name'=> $admin["name"],
+      "username"=> $admin["username"]
+    ];
+
 
     $res->json([
       'code' => 'success',

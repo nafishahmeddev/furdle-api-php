@@ -69,7 +69,8 @@ class TokenHelper
       'iat' => time(),
       'exp' => time() + ($expiry * 7), // 7x access token expiry
       'type' => 'refresh',
-      "accessToken" => $accessToken
+      "accessToken" => $accessToken,
+      "user"=> $payload
     ];
 
 
