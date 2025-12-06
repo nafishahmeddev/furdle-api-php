@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Helpers\TokenHelper;
 use App\Helpers\MockDataHelper;
+use App\Helpers\Logger;
 use App\Core\Request;
 use App\Core\Response;
 
@@ -43,10 +44,8 @@ class WebhookController
     $event = $data['event'];
     $webhookData = $data['data'];
 
-    // Log webhook event
-    error_log("Face Recognition Webhook: {$event} - " . json_encode($webhookData));
-
-    // Handle different event types
+        // Log webhook event
+        Logger::webhook($event, $webhookData);    // Handle different event types
     switch ($event) {
       case 'face.matched':
         $this->handleFaceMatched($webhookData, $res);
@@ -80,10 +79,8 @@ class WebhookController
       return;
     }
 
-    // Log generic webhook
-    error_log("Generic Webhook: " . json_encode($data));
-
-    $res->json(MockDataHelper::apiResponse([
+        // Log generic webhook
+        Logger::webhook('generic', $data);    $res->json(MockDataHelper::apiResponse([
       'received' => true,
       'timestamp' => date('Y-m-d H:i:s'),
       'data' => $data
