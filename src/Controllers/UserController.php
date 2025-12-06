@@ -51,15 +51,20 @@ class UserController
         if ($type == "staff") {
             $admin = DbHelper::selectOne("SELECT * FROM admin WHERE adminId=?", [$code]);
             if ($admin != null) {
+                $dynamicFields = [];
+                $dynamicFields["id"] = $admin["id"];
+                $dynamicFields["name"] = $admin["name"];
+                $dynamicFields["username"] = $admin["username"];
+                $dynamicFields["branch"] = $admin["branch_code"];
                 $user = [
                     'code' => (string) $admin['adminId'],
                     'name' => $admin["name"],
-                    "description" => $admin["adminType"],
                     "facePayload" => [
                         "code" => (string) $admin["adminId"],
                         "type" => "admin",
                         "branch" => $admin["branch_code"],
-                    ]
+                    ],
+                    "preview" => $dynamicFields
                 ];
             }
         } else if ($type == "student") {
@@ -72,24 +77,36 @@ class UserController
                     $session = (string) $history['asession'];
                     $class = (string) $history['class'];
                     $board = (string) $history['board'];
-                    $description = "Student from branch {$branch}, session {$session}, class {$class}, board {$board}";
+                    //dynamic filed is for displaying data in future if needed
+                    $dynamicFields = [];
+
+                    $dynamicFields[] = ["label" => "Register no", "value" => $code];
+                    $dynamicFields[] = ["label" => "Branch", "value" => $branch];
+                    $dynamicFields[] = ["label" => "Session", "value" => $session];
+                    $dynamicFields[] = ["label" => "Class", "value" => $class];
+                    $dynamicFields[] = ["label" => "Board", "value" => $board];
+
                     $user = [
                         'code' => $code,
                         'name' => $student["name"],
-                        "description" => $description,
                         "facePayload" => [
                             "code" => $code,
                             "type" => "student",
                             "branch" => $branch,
                             "session" => $session,
                             "class" => $class
-                        ]
+                        ],
+                        "preview" => $dynamicFields,
                     ];
                 }
             }
         } else {
             //TODO: fetch from real database
             $user = MockDataHelper::getUserByCode($code, $type);
+            $user["preview"] = [
+                "name"=> $user["name"],
+                "code"=> $code,
+            ];
             if (!$user) {
                 $res->status(404)->json([
                     'code' => 'error',
