@@ -38,7 +38,7 @@ class MockDataHelper
             'name' => 'Staff (Branch Only)',
             'description' => 'Staff meeting for XFM1000231 branch.',
             'facePayload' => [
-                'type' => 'staff',
+                'type' => 'admin',
                 'branch' => 'XFM1000231'
             ],
         ],
@@ -47,7 +47,7 @@ class MockDataHelper
             'name' => 'Staff (Global)',
             'description' => 'General announcements for all students and staff.',
             'facePayload' => [
-                'type' => 'staff'
+                'type' => 'admin'
             ],
         ],
         [
@@ -86,7 +86,7 @@ class MockDataHelper
             'name' => 'Staff Meeting XFM1000232',
             'description' => 'Branch-specific staff meeting.',
             'facePayload' => [
-                'type' => 'staff',
+                'type' => 'admin',
                 'branch' => 'XFM1000232'
             ],
         ]
