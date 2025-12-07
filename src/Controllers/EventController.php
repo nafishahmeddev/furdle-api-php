@@ -44,7 +44,7 @@ class EventController
     public function attend(Request $req, Response $res): void
     {
         $data = $req->json();
-        if (!$data || !isset($data['type']) || !isset($data['code'])) {
+        if (!$data) {
             $res->status(400)->json([
                 'code' => 'error',
                 'message' => 'Type and code are required'
@@ -53,6 +53,14 @@ class EventController
         }
 
         $payload = $data["payload"];
+
+        if (!$payload || !isset($payload['type']) || !isset($payload['code'])) {
+            $res->status(400)->json([
+                'code' => 'error',
+                'message' => 'Payload is required'
+            ]);
+            return;
+        }
 
         $type = $payload['type'];
         $code = $payload['code'];
