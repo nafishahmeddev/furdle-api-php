@@ -32,6 +32,7 @@ return function ($router) {
         // Events
         $router->group('/events', function ($router) {
             $router->post('', 'App\Controllers\EventController@index');
+            $router->post('/attend', 'App\Controllers\EventController@attend');
         }, ['App\Middlewares\AuthMiddleware']);
 
         // Constants
