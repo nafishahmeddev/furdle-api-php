@@ -200,7 +200,7 @@ class AuthController
 
     $user = $req->auth;
     //fetch user from database
-    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=? AND password=?', [$user->id, $password]);
+    $admin = DbHelper::selectOne('SELECT * FROM admin WHERE adminId=? AND password=? LIMIT 1', [$user->id, $password]);
     if ($admin == null) {
       $res->status(400)->json([
         'code' => 'error',
