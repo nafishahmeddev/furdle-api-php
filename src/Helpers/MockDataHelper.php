@@ -22,8 +22,6 @@ class MockDataHelper
                 'session' => '2025',
                 'class' => '5'
             ],
-            'created_at' => '2024-11-01 08:00:00',
-            'is_active' => true
         ],
         [
             'code' => '2',
@@ -34,8 +32,6 @@ class MockDataHelper
                 'session' => '2025',
                 'class' => '5'
             ],
-            'created_at' => '2024-11-02 09:00:00',
-            'is_active' => true
         ],
         [
             'code' => '3',
@@ -45,8 +41,6 @@ class MockDataHelper
                 'type' => 'staff',
                 'branch' => 'XFM1000231'
             ],
-            'created_at' => '2024-11-03 10:00:00',
-            'is_active' => true
         ],
         [
             'code' => '4',
@@ -55,8 +49,6 @@ class MockDataHelper
             'facePayload' => [
                 'type' => 'staff'
             ],
-            'created_at' => '2024-11-04 11:00:00',
-            'is_active' => true
         ],
         [
             'code' => '5',
@@ -67,8 +59,6 @@ class MockDataHelper
                 'session' => '2025',
                 'class' => '5'
             ],
-            'created_at' => '2024-11-05 12:00:00',
-            'is_active' => true
         ],
         [
             'code' => '6',
@@ -80,8 +70,6 @@ class MockDataHelper
                 'session' => '2025',
                 'class' => '6'
             ],
-            'created_at' => '2024-11-06 13:00:00',
-            'is_active' => true
         ],
         [
             'code' => '7',
@@ -92,8 +80,6 @@ class MockDataHelper
                 'session' => '2025',
                 'class' => '5'
             ],
-            'created_at' => '2024-11-07 14:00:00',
-            'is_active' => true
         ],
         [
             'code' => '8',
@@ -103,8 +89,6 @@ class MockDataHelper
                 'type' => 'staff',
                 'branch' => 'XFM1000232'
             ],
-            'created_at' => '2024-11-08 15:00:00',
-            'is_active' => true
         ]
     ];
 
