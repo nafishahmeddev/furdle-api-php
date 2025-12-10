@@ -74,12 +74,12 @@ class ThirdPartyController
         "token" => $faceToken,
         "query" => [
           "type" => "admission",
-          "admission_exam_session_id" => $admission_exam_session_id,
+          "admission_exam_session_id" => (string) $admission_exam_session_id,
         ],
         "payload" => [
           "code" => (string) $student["form_no"],
           "type" => "admission",
-          "admission_exam_session_id" => $admission_exam_session_id,
+          "admission_exam_session_id" => (string) $admission_exam_session_id,
         ],
 
       ]);
