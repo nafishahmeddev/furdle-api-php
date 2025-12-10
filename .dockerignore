@@ -8,6 +8,10 @@ README.md
 docker-compose.yml
 Dockerfile
 .dockerignore
+frontend
+package.json
+package-lock.json
+tailwind.config.js
 .vscode
 .idea
 *.log

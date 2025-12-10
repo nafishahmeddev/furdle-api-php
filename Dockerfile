@@ -33,13 +33,14 @@ COPY . .
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/sites-available/default
 
-# Create nginx log directory
-RUN mkdir -p /var/log/nginx
+# Create nginx and application log directories
+RUN mkdir -p /var/log/nginx /var/www/logs
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www \
-    && chmod +x /var/www/bootstrap.php
+    && chmod +x /var/www/bootstrap.php \
+    && chmod -R 777 /var/www/logs
 
 # Create supervisor configuration
 RUN echo '[supervisord]\n\
