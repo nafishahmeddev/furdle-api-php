@@ -139,51 +139,57 @@ class EventController
                 }
             }
         } else if (strpos($type, "admission:") === 0) {
-            list($type, $id) = explode($type, $type);
-
-            //find session id in database
-            $sessionDetail = DbHelper::selectOne(
-                'SELECT * FROM admission_exam_session WHERE admission_exam_session_id=?',
-                [$id]
-            );
-            if ($sessionDetail == null) {
-                $res->status(404)->json(['message' => 'Invalid session', "code" => "error"]);
-                return;
-            }
-            $control_session_id = $sessionDetail['control_session_id'];
-
-            // Make HTTP request to get student data using HttpClient
-            $client = new HttpClient();
-            $client->setVerifySSL(false);
-
-            //call api to get student details
-            $response = $client->get(
-                'https://aamsystem.in/alameen2023/import_student_api/api/admission.php',
-                [
-                    'action' => 'get_students_by_form_no',
-                    'controll_session' => $control_session_id,
-                    'form_no' => $code
+            $user = [
+                "preview" => [
+                    "label" => "Admission Exam Candidate", "value" => "Details fetched from third party API"
                 ]
-            );
-
-            if ($response['status'] !== 200) {
-                $res->status($response['status'])->json(['error' => 'API request failed', 'code' => $response['status']]);
-                return;
-            }
-
-            $decoded = @$client->decodeJson($response);
-            $result = @$decoded['data'];
-            $student = @$result[0];
-            if ($student != null) {
-                $preview = [];
-                $preview[] = ['label' => 'Name', 'value' => (string) $student['student_name']];
-                $preview[] = ["label" => "Form no", "value" => (string) $student['form_no']];
-                $preview[] = ['label' => 'Class', 'value' => (string) $student['class_name']];
-
-                $user = [
-                    "preview" => $preview,
                 ];
-            }
+            
+            // list($type, $id) = explode($type, $type);
+
+            // //find session id in database
+            // $sessionDetail = DbHelper::selectOne(
+            //     'SELECT * FROM admission_exam_session WHERE admission_exam_session_id=?',
+            //     [$id]
+            // );
+            // if ($sessionDetail == null) {
+            //     $res->status(404)->json(['message' => 'Invalid session', "code" => "error"]);
+            //     return;
+            // }
+            // $control_session_id = $sessionDetail['control_session_id'];
+
+            // // Make HTTP request to get student data using HttpClient
+            // $client = new HttpClient();
+            // $client->setVerifySSL(false);
+
+            // //call api to get student details
+            // $response = $client->get(
+            //     'https://aamsystem.in/alameen2023/import_student_api/api/admission.php',
+            //     [
+            //         'action' => 'get_students_by_form_no',
+            //         'controll_session' => $control_session_id,
+            //         'form_no' => $code
+            //     ]
+            // );
+
+            // if ($response['status'] !== 200) {
+            //     $res->status($response['status'])->json(['error' => 'API request failed', 'code' => $response['status']]);
+            //     return;
+            // }
+
+            // $decoded = @$client->decodeJson($response);
+            // $result = @$decoded['data'];
+            // $student = @$result[0];
+            // if ($student != null) {
+            //     $preview = [];
+            //     $preview[] = ['label' => 'Name', 'value' => (string) $student['student_name']];
+            //     $preview[] = ["label" => "Form no", "value" => (string) $student['form_no']];
+            //     $preview[] = ['label' => 'Class', 'value' => (string) $student['class_name']];
+
+            //     $user = [
+            //         "preview" => $preview,
+            //     ];
+            // }
         }
 
         if (!$user) {
