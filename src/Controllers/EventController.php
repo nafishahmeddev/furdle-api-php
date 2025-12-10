@@ -141,10 +141,13 @@ class EventController
         } else if (strpos($event_code, "admission:") === 0) {
             $user = [
                 "preview" => [
-                    "label" => "Admission Exam Candidate", "value" => "Details fetched from third party API"
+                    [
+                        "label" => "Admission Exam Candidate",
+                        "value" => "Details fetched from third party API"
+                    ]
                 ]
-                ];
-            
+            ];
+
             // list($type, $id) = explode($type, $type);
 
             // //find session id in database
