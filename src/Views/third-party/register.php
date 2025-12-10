@@ -153,7 +153,7 @@
                 return;
             }
             
-            if (d.type === 'face_captured' && d.image) {
+            if (d.type === 'face_confirmed' && d.image) {
                 // Auto-submit the form when face is captured
                 const form = document.createElement('form');
                 form.method = 'POST';
