@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "watch": "npx @tailwindcss/cli -i ./resources/styles/main.css -o ./public/styles/main.css --watch --minify"
+    "watch": "npx @tailwindcss/cli -i ./resources/styles/main.css -o ./public/styles/main.css --watch"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.17",
