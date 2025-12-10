@@ -32,39 +32,23 @@ class FaceApiHelper
   /**
    * Generate client token from Face API.
    *
-   * @param string $code
-   * @param string|null $bearerToken
    * @return string|null
    */
   public static function generateToken(): ?string
   {
-    $data = json_encode(['code' => 'ORG1']);
-
-    $headers = [
-      'Content-Type: application/json',
-      'Content-Length: ' . strlen($data)
-    ];
-    $token = self::getApiToken();
-    $headers[] = "Authorization: Bearer $token";
-
-    $ch = curl_init(self::getApiUrl());
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch); // Not needed in PHP 8+, resources are auto-cleaned
-
     try {
-      $data = null;
-      if ($httpCode === 200 && $response) {
-        $decoded = json_decode($response, true);
-        if(isset($decoded['result'])) {
-          if(isset($decoded['result']['token'])) {
-            return $decoded['result']['token'];
-          }
+      $client = new \App\Core\HttpClient();
+      $client->setHeaders([
+        'Content-Type' => 'application/json',
+        'Authorization' => 'Bearer ' . self::getApiToken()
+      ]);
+
+      $response = $client->post(self::getApiUrl(), ['code' => 'ORG1']);
+      $decoded = $client->decodeJson($response);
+
+      if ($response['status'] === 200) {
+        if (isset($decoded['result']['token'])) {
+          return $decoded['result']['token'];
         }
       }
     } catch (\Exception $e) {
