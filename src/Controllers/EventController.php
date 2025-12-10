@@ -46,6 +46,18 @@ class EventController
             $events[] = $record;
         }
 
+        $events[] = [
+            "code" => "admission:1",
+            "name" => "Admission Exam Attendance",
+            'description' => 'For marking attendance manually for admission exam candidates',
+            'query' => [
+                'admission_exam_session_id' => '1',
+            ],
+            "payload" => [
+                "event_code" => "admission:1",
+            ],
+        ];
+
         $res->json(MockDataHelper::apiResponse([
             'records' => $events
         ], 'Attendance list retrieved successfully'));
