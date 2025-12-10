@@ -91,7 +91,7 @@ class EventController
             ]);
             return;
         }
-
+        $event_code = $data['code'];
         $type = $payload['type'];
         $code = $payload['code'];
 
@@ -138,7 +138,7 @@ class EventController
                     ];
                 }
             }
-        } else if (strpos($type, "admission:") === 0) {
+        } else if (strpos($event_code, "admission:") === 0) {
             $user = [
                 "preview" => [
                     "label" => "Admission Exam Candidate", "value" => "Details fetched from third party API"
