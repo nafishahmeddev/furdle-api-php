@@ -559,6 +559,12 @@
     --tw-duration: 200ms;
     transition-duration: 200ms;
   }
+  .\[program\:nginx\] {
+    program: nginx;
+  }
+  .\[program\:php-fpm\] {
+    program: php-fpm;
+  }
   .hover\:-translate-y-0\.5 {
     &:hover {
       @media (hover: hover) {
