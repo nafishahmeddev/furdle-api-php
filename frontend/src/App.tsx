@@ -210,7 +210,7 @@ function App() {
         {/* Main Content */}
         <main className="px-6 py-6 space-y-6">
           {/* Student Info Card */}
-          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+          <div className="bg-white border border-gray-200 rounded-2xl p-5">
             <div className="flex items-center space-x-4">
               <div className="relative">
                 <img
