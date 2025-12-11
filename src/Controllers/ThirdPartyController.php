@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Helpers\TokenHelper;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\HttpClient;
@@ -44,7 +43,7 @@ class ThirdPartyController
         [$control_session]
       );
       if ($sessionDetail == null) {
-        $res->status(404)->json(['error' => 'Invalid session']);
+        $res->status(404)->json(['code' => 'error', 'message' => 'Invalid session']);
         return;
       }
       $admission_exam_session_id = $sessionDetail['admission_exam_session_id'];
@@ -58,15 +57,22 @@ class ThirdPartyController
       );
 
       if ($response['status'] !== 200) {
-        $res->status($response['status'])->json(['error' => 'API request failed', 'code' => $response['status']]);
+        $res->status($response['status'])->json(['code' => 'error', 'message' => 'API request failed']);
         return;
       }
 
-      $decoded = @$client->decodeJson($response);
-      $result = @$decoded['data'];
-      $student = @$result[0];
-      if (!$student) {
-        $res->status(404)->json(['error' => 'Student not found']);
+      $student = null;
+
+      try {
+        $decoded = @$client->decodeJson($response);
+        $result = @$decoded['data'];
+        $student = @$result[0];
+      } catch (\Exception $e) {
+        $res->status(500)->json(['code' => 'error', 'message' => 'Failed to decode student data', 'details' => $e->getMessage()]);
+        return;
+      }
+      if ($student == null || !$student) {
+        $res->status(404)->json(['code' => 'error', 'message' => 'Student not found']);
         return;
       }
 
@@ -91,7 +97,7 @@ class ThirdPartyController
         ]
       ]);
     } catch (\Exception $e) {
-      $res->status(500)->json(['error' => 'Failed to fetch student data', 'details' => $e->getMessage()]);
+      $res->status(500)->json(['code' => 'error', 'message' => 'Failed to fetch student data', 'details' => $e->getMessage()]);
     }
   }
 }
