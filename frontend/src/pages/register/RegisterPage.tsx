@@ -20,6 +20,7 @@ function RegisterPage() {
   const query = new URLSearchParams(window.location.search);
   const formNo: string = query.get('form_no') || '';
   const session: string = query.get('session') || '';
+  const redirect: string = query.get('redirect') || '';
   const queryClient = useQueryClient();
 
   const [iframeHeight, setIframeHeight] = useState('400px');
@@ -104,6 +105,14 @@ function RegisterPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (registerMutation.isSuccess && redirect) {
+      setTimeout(() => {
+        window.location.href = redirect;
+      }, 3000);
+    }
+  }, [registerMutation.isSuccess, redirect]);
+
 
   // Early return for loading state
   if (!formNo || !session) {
@@ -155,7 +164,10 @@ function RegisterPage() {
             <Icon icon="mdi:check-circle" style={{ fontSize: '2.5rem', color: '#16a34a' }} />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Registration Successful!</h2>
-          <p className="text-gray-600 leading-relaxed">Your face has been successfully registered in our system.</p>
+          <p className="text-gray-600 leading-relaxed mb-4">Your face has been successfully registered in our system.</p>
+          {redirect && (
+            <p className="text-sm text-gray-500">You will be redirected in 3 seconds...</p>
+          )}
         </div>
       </div>
     );
