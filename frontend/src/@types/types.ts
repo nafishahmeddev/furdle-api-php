@@ -4,6 +4,22 @@ export interface ApiResponse<T = undefined> {
   message: string
 }
 
+export interface FaceRecord {
+  face_id: number
+  [key: string]: unknown
+}
+
+export interface FaceSearchResponse {
+  result: FaceRecord[]
+  [key: string]: unknown
+}
+
+export interface FaceOperationResponse {
+  success: boolean
+  message?: string
+  [key: string]: unknown
+}
+
 export type ThirdPartyLookupApiResponse = ApiResponse<{
   admission_session_id: number
   payload: Record<string, string>,

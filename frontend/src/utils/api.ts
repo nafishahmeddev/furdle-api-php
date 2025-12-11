@@ -1,5 +1,9 @@
-import axios, { AxiosInstance } from 'axios';
-import type { ThirdPartyLookupApiResponse } from '../@types/types';
+import axios, {type  AxiosInstance } from 'axios';
+import type { 
+  ThirdPartyLookupApiResponse, 
+  FaceSearchResponse, 
+  FaceOperationResponse 
+} from '../@types/types';
 
 class ApiService {
   private baseApi: AxiosInstance;
@@ -8,9 +12,7 @@ class ApiService {
   constructor() {
     this.baseApi = axios.create({
       baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      // Don't set Content-Type by default to avoid triggering preflight requests
     });
   }
 
@@ -35,19 +37,27 @@ class ApiService {
     const response = await this.baseApi.post('/api/third-party', {
       form_no: formNo,
       session,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
     return response.data;
   }
 
   // Search for existing faces
-  async searchFaces(baseUrl: string, token: string, query: any) {
+  async searchFaces(baseUrl: string, token: string, query: Record<string, unknown>): Promise<FaceSearchResponse> {
     const faceApi = this.initFaceApi(baseUrl, token);
-    const response = await faceApi.post('/faces/search', { query });
+    const response = await faceApi.post('/faces/search', { query }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   }
 
   // Delete a face
-  async deleteFace(baseUrl: string, token: string, faceId: number) {
+  async deleteFace(baseUrl: string, token: string, faceId: number): Promise<FaceOperationResponse> {
     const faceApi = this.initFaceApi(baseUrl, token);
     const response = await faceApi.delete(`/face/${faceId}`);
     return response.data;
@@ -58,9 +68,9 @@ class ApiService {
     baseUrl: string,
     token: string,
     imageFile: File,
-    payload: any,
-    query: any
-  ) {
+    payload: Record<string, unknown>,
+    query: Record<string, unknown>
+  ): Promise<FaceOperationResponse> {
     const faceApi = this.initFaceApi(baseUrl, token);
     
     const formData = new FormData();

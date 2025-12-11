@@ -1,7 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
-import { ApiUtils } from './utils/api';
-import type { ThirdPartyLookupApiResponse } from './@types/types';
+import { apiService } from './utils/api';
+
+// Utility function to convert data URL to File
+const dataURLtoFile = (dataurl: string, filename: string): File => {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)![1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+};
 
 function App() {
   const query = new URLSearchParams(window.location.search);
@@ -9,95 +21,60 @@ function App() {
   const session: string = query.get('session') || '';
   const queryClient = useQueryClient();
 
-  const dataURLtoFile = (dataurl: string, filename: string): File => {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  };
-
   const [iframeHeight, setIframeHeight] = useState('400px');
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const { data: lookupData } = useQuery({
-    queryKey: ['hello'],
-    queryFn: async () => {
-      const res = await fetch(ApiUtils.getApiUrl('/api/third-party'), {
-        method: 'POST',
-        body: JSON.stringify({ form_no: formNo, session }),
-      });
-      return res.json() as Promise<ThirdPartyLookupApiResponse>;
-    },
+    queryKey: ['third-party-lookup', formNo, session],
+    queryFn: () => apiService.thirdPartyLookup(formNo, session),
+    enabled: !!formNo && !!session,
   });
 
   const faceQuery = useQuery({
-    queryKey: ['faces', lookupData],
-    queryFn: async () => {
-      const baseUrl = lookupData?.result.url || '';
-      const url = new URL(baseUrl);
-      url.pathname += '/faces/search';
-      const res = await fetch(url.toString(), {
-        method: 'POST',
-        body: JSON.stringify({
-          query: {
-            ...(lookupData?.result.query || {}),
-            code: lookupData?.result.student.form_no,
-          },
-        }),
-        headers: {
-          'Authorization': `Bearer ${lookupData?.result.token || ''}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      return res.json();
+    queryKey: ['faces', lookupData?.result.student.form_no],
+    queryFn: () => {
+      if (!lookupData) throw new Error('Lookup data not available');
+      const query = {
+        ...(lookupData.result.query || {}),
+        code: lookupData.result.student.form_no,
+      };
+      return apiService.searchFaces(
+        lookupData.result.url,
+        lookupData.result.token,
+        query
+      );
     },
-    enabled: lookupData !== undefined,
+    enabled: !!lookupData,
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (faceId: number) => {
-      const baseUrl = lookupData?.result.url || '';
-      const url = new URL(baseUrl);
-      url.pathname += `/face/${faceId}`;
-      const res = await fetch(url.toString(), {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${lookupData?.result.token || ''}`,
-        },
-      });
-      return res.json();
+      if (!lookupData) throw new Error('Lookup data not available');
+      return apiService.deleteFace(
+        lookupData.result.url,
+        lookupData.result.token,
+        faceId
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['faces', lookupData] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['faces', lookupData?.result.student.form_no] 
+      });
     },
   });
 
   const registerMutation = useMutation({
     mutationFn: async (image: string) => {
-      const baseUrl = lookupData?.result.url || '';
-      const url = new URL(baseUrl);
-      url.pathname += '/face/register';
-
-      // Prepare payload
-      const formData = new FormData();
+      if (!lookupData) throw new Error('Lookup data not available');
+      
       const file = dataURLtoFile(image, 'face.jpg');
-      formData.append('image', file);
-      formData.append('payload', JSON.stringify(lookupData?.result.payload || {}));
-      formData.append('query', JSON.stringify(lookupData?.result.query || {}));
-
-      const res = await fetch(url.toString(), {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${lookupData?.result.token || ''}`,
-        },
-        body: formData,
-      });
-      return res.json();
+      return apiService.registerFace(
+        lookupData.result.url,
+        lookupData.result.token,
+        file,
+        lookupData.result.payload || {},
+        lookupData.result.query || {}
+      );
     },
   });
 
@@ -116,6 +93,35 @@ function App() {
     return () => window.removeEventListener('message', handleMessage);
   }, [lookupData, registerMutation]);
 
+
+  // Early return for loading state
+  if (!formNo || !session) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-50 to-orange-50">
+        <div className="text-center max-w-md px-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="alert-circle" className="w-8 h-8 text-red-600"></i>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid Access</h2>
+          <p className="text-gray-600">Form number and session are required to access this page.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (lookupData?.code !== '200') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-50 to-orange-50">
+        <div className="text-center max-w-md px-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="x-circle" className="w-8 h-8 text-red-600"></i>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600">{lookupData?.message || 'Unable to verify your session.'}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!lookupData) {
     return (
@@ -222,7 +228,7 @@ function App() {
           </div>
 
           {/* Face Registration Section */}
-          {faceQuery.data && faceQuery.data.result.records.length > 0 ? (
+          {faceQuery.data && faceQuery.data.result && faceQuery.data.result.length > 0 ? (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
               <div className="flex items-start mb-3">
                 <i data-lucide="alert-triangle" className="w-5 h-5 text-yellow-600 mr-3 mt-0.5"></i>
@@ -233,7 +239,7 @@ function App() {
               </p>
               <button
                 onClick={() => {
-                  const existingFaceId = faceQuery.data?.result[0]?.face_id;
+                  const existingFaceId = faceQuery.data?.result?.[0]?.face_id;
                   if (existingFaceId) {
                     deleteMutation.mutate(existingFaceId);
                   }
