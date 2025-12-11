@@ -5,6 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="/public/styles/main.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
@@ -13,7 +18,7 @@
   <?php if (isset($student) && is_array($student)): ?>
     <div class="min-h-screen max-w-md mx-auto bg-white shadow-xl">
       <!-- Header -->
-      <div class="bg-linear-to-r from-blue-600 to-indigo-600 text-white px-4 py-5 relative overflow-hidden">
+      <div class="bg-indigo-600 text-white px-4 py-5 relative overflow-hidden">
         <div class="absolute inset-0 bg-black opacity-10"></div>
         <div class="relative z-10">
           <h1 class="text-xl font-bold flex items-center">
@@ -56,6 +61,7 @@
           </div>
         </div>
 
+
         <!-- Face Capture Section -->
         <div class="bg-white border-2 border-dashed border-gray-300 rounded-xl py-4">
           <div class="text-center py-4 px-4">
@@ -69,6 +75,33 @@
               class="w-full border-0"
               allow="camera; microphone; autoplay"></iframe>
           </div>
+
+        </div>
+
+        <!--- Instructions -->
+        <div class="px-4 py-3 bg-red-50 rounded-lg border border-red-200 mt-4">
+          <h4 class="text-sm font-bold text-red-800 mb-2 flex items-center">
+            <i data-lucide="alert-triangle" class="w-4 h-4 mr-2 text-red-600"></i>
+            Critical Instructions
+          </h4>
+          <ul class="text-sm text-red-700 space-y-1">
+            <li class="flex items-start">
+              <i data-lucide="x-circle" class="w-4 h-4 mr-2 text-red-600 mt-0.5 shrink-0"></i>
+              Ensure you are in a well-lit area.
+            </li>
+            <li class="flex items-start">
+              <i data-lucide="x-circle" class="w-4 h-4 mr-2 text-red-600 mt-0.5 shrink-0"></i>
+              Position your face within the frame displayed in the capture area.
+            </li>
+            <li class="flex items-start">
+              <i data-lucide="x-circle" class="w-4 h-4 mr-2 text-red-600 mt-0.5 shrink-0"></i>
+              Avoid wearing hats, sunglasses, or anything that may obscure your face.
+            </li>
+            <li class="flex items-start">
+              <i data-lucide="x-circle" class="w-4 h-4 mr-2 text-red-600 mt-0.5 shrink-0"></i>
+              Follow the on-screen prompts to capture your face.
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -133,7 +166,7 @@
     }
 
     // Listen for messages from iframe
-    window.addEventListener('message', function(event) {
+    window.addEventListener('message', async function(event) {
       const d = event.data || {};
       if (d.type === 'resize' && d.height) {
         iframe.style.height = d.height + 'px';
@@ -152,27 +185,25 @@
         formData.append('payload', JSON.stringify(<?php echo json_encode($payload); ?>));
         formData.append('query', JSON.stringify(<?php echo json_encode($query); ?>));
 
-        fetch('<?php echo $url; ?>', {
+        try {
+          const response = await fetch('<?php echo $url; ?>', {
             method: 'POST',
             headers: {
               'Authorization': 'Bearer <?php echo $token; ?>'
             },
             body: formData
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              // Handle success - show success message or redirect
-              alert('Face registered successfully!');
-            } else {
-              // Handle error
-              alert('Registration failed: ' + (data.message || 'Unknown error'));
-            }
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred during registration');
           });
+          if (response.ok) {
+            alert('Face data submitted successfully!');
+            // Optionally redirect or update UI
+          } else {
+            const result = await response.json();
+            alert('Failed to submit face data: ' + (result?.message || response.statusText));
+          }
+        } catch (e) {
+          alert('Failed to submit face data. Please try again.');
+          return;
+        }
         return;
       }
     });
