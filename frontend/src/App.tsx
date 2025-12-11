@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
+import { Icon } from '@iconify/react';
 import { apiService } from './utils/api';
 
 // Utility function to convert data URL to File
@@ -57,8 +58,8 @@ function App() {
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: ['faces', lookupQuery.data?.result.student.form_no] 
+      queryClient.invalidateQueries({
+        queryKey: ['faces', lookupQuery.data?.result.student.form_no]
       });
     },
   });
@@ -66,7 +67,7 @@ function App() {
   const registerMutation = useMutation({
     mutationFn: async (image: string) => {
       if (!lookupQuery.data) throw new Error('Lookup data not available');
-      
+
       const file = dataURLtoFile(image, 'face.jpg');
       return apiService.registerFace(
         lookupQuery.data.result.url,
@@ -93,6 +94,16 @@ function App() {
     return () => window.removeEventListener('message', handleMessage);
   }, [lookupQuery.data, registerMutation]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: 'getHeight' },
+        '*'
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
 
   // Early return for loading state
   if (!formNo || !session) {
@@ -100,7 +111,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-50 to-orange-50">
         <div className="text-center max-w-md px-6">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i data-lucide="alert-circle" className="w-8 h-8 text-red-600"></i>
+            <Icon icon="mdi:alert-circle" style={{ fontSize: '2rem', color: '#dc2626' }} />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid Access</h2>
           <p className="text-gray-600">Form number and session are required to access this page.</p>
@@ -126,7 +137,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-red-50 to-orange-50">
         <div className="text-center max-w-md px-6">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i data-lucide="x-circle" className="w-8 h-8 text-red-600"></i>
+            <Icon icon="mdi:close-circle" style={{ fontSize: '2rem', color: '#dc2626' }} />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
           <p className="text-gray-600">{'Unable to verify your session.'}</p>
@@ -135,13 +146,13 @@ function App() {
     );
   }
 
-  
+
   if (registerMutation.isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-green-50 to-emerald-50 px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <i data-lucide="check-circle" className="w-10 h-10 text-green-600"></i>
+            <Icon icon="mdi:check-circle" style={{ fontSize: '2.5rem', color: '#16a34a' }} />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Registration Successful!</h2>
           <p className="text-gray-600 leading-relaxed">Your face has been successfully registered in our system.</p>
@@ -159,7 +170,7 @@ function App() {
           <div className="relative z-10">
             <div className="flex items-center mb-2">
               <div className="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-3">
-                <i data-lucide="camera" className="w-5 h-5"></i>
+                <Icon icon="mdi:camera" style={{ fontSize: '1.25rem', color: 'white' }} />
               </div>
               <h1 className="text-2xl font-bold">Face Registration</h1>
             </div>
@@ -181,7 +192,7 @@ function App() {
         {registerMutation.isError && (
           <div className="px-6 py-4 bg-red-50 border-b border-red-200">
             <div className="flex items-center">
-              <i data-lucide="alert-circle" className="w-5 h-5 text-red-600 mr-3"></i>
+              <Icon icon="mdi:alert-circle" style={{ fontSize: '1.25rem', color: '#dc2626' }} className="mr-3" />
               <p className="text-sm text-red-700">Failed to register face. Please try again.</p>
             </div>
           </div>
@@ -190,7 +201,7 @@ function App() {
         {deleteMutation.isError && (
           <div className="px-6 py-4 bg-red-50 border-b border-red-200">
             <div className="flex items-center">
-              <i data-lucide="alert-circle" className="w-5 h-5 text-red-600 mr-3"></i>
+              <Icon icon="mdi:alert-circle" style={{ fontSize: '1.25rem', color: '#dc2626' }} className="mr-3" />
               <p className="text-sm text-red-700">Failed to delete existing face. Please try again.</p>
             </div>
           </div>
@@ -208,7 +219,7 @@ function App() {
                   className="w-16 h-16 rounded-full object-cover border-2 border-indigo-200"
                 />
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <i data-lucide="check" className="w-3 h-3 text-white"></i>
+                  <Icon icon="mdi:check" style={{ fontSize: '0.75rem', color: 'white' }} />
                 </div>
               </div>
               <div className="flex-1">
@@ -217,11 +228,11 @@ function App() {
                 </h3>
                 <div className="space-y-1">
                   <div className="flex items-center text-sm text-gray-600">
-                    <i data-lucide="file-text" className="w-4 h-4 mr-2 text-gray-400"></i>
+                    <Icon icon="mdi:file-document" style={{ fontSize: '1rem', color: '#9ca3af' }} className="mr-2" />
                     Form: {lookupQuery.data.result.student.form_no}
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <i data-lucide="graduation-cap" className="w-4 h-4 mr-2 text-gray-400"></i>
+                    <Icon icon="mdi:school" style={{ fontSize: '1rem', color: '#9ca3af' }} className="mr-2" />
                     Class: {lookupQuery.data.result.student.class_name}
                   </div>
                 </div>
@@ -233,7 +244,7 @@ function App() {
           {faceQuery.data && faceQuery.data.result && faceQuery.data.result.records.length > 0 ? (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
               <div className="flex items-start mb-3">
-                <i data-lucide="alert-triangle" className="w-5 h-5 text-yellow-600 mr-3 mt-0.5"></i>
+                <Icon icon="mdi:alert" style={{ fontSize: '1.25rem', color: '#d97706' }} className="mr-3 mt-0.5" />
                 <h4 className="text-sm font-bold text-yellow-800">Face Already Registered</h4>
               </div>
               <p className="text-sm text-yellow-700 mb-4 leading-relaxed">
@@ -262,8 +273,8 @@ function App() {
           ) : (
             <>
               {/* Face Capture */}
-              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl p-4">
-                <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+              <div className="bg-white border-2 border-dashed border-gray-300 rounded-2xl p-4">
+                <div>
                   <iframe
                     id="captureFrame"
                     ref={iframeRef}
@@ -284,24 +295,24 @@ function App() {
               {/* Instructions */}
               <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
                 <div className="flex items-center mb-3">
-                  <i data-lucide="alert-triangle" className="w-5 h-5 text-red-600 mr-3"></i>
+                  <Icon icon="mdi:alert" style={{ fontSize: '1.25rem', color: '#dc2626' }} className="mr-3" />
                   <h4 className="text-sm font-bold text-red-800">Important Instructions</h4>
                 </div>
                 <ul className="text-sm text-red-700 space-y-2">
                   <li className="flex items-start">
-                    <i data-lucide="x-circle" className="w-4 h-4 mr-3 text-red-600 mt-0.5 shrink-0"></i>
+                    <Icon icon="mdi:circle-outline" style={{ fontSize: '1rem', color: '#dc2626' }} className="mr-3 mt-0.5 shrink-0" />
                     Ensure you are in a well-lit area
                   </li>
                   <li className="flex items-start">
-                    <i data-lucide="x-circle" className="w-4 h-4 mr-3 text-red-600 mt-0.5 shrink-0"></i>
+                    <Icon icon="mdi:circle-outline" style={{ fontSize: '1rem', color: '#dc2626' }} className="mr-3 mt-0.5 shrink-0" />
                     Position your face within the capture frame
                   </li>
                   <li className="flex items-start">
-                    <i data-lucide="x-circle" className="w-4 h-4 mr-3 text-red-600 mt-0.5 shrink-0"></i>
+                    <Icon icon="mdi:circle-outline" style={{ fontSize: '1rem', color: '#dc2626' }} className="mr-3 mt-0.5 shrink-0" />
                     Remove hats, sunglasses, or anything obscuring your face
                   </li>
                   <li className="flex items-start">
-                    <i data-lucide="x-circle" className="w-4 h-4 mr-3 text-red-600 mt-0.5 shrink-0"></i>
+                    <Icon icon="mdi:circle-outline" style={{ fontSize: '1rem', color: '#dc2626' }} className="mr-3 mt-0.5 shrink-0" />
                     Follow the on-screen prompts to complete capture
                   </li>
                 </ul>
