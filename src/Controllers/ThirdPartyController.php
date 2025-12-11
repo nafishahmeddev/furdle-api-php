@@ -88,7 +88,12 @@ class ThirdPartyController
         'code' => 'success',
         'message' => 'Student data retrieved successfully',
         'result' => [
-          'student' => $student,
+          'student' => [
+            "form_no" => $student["form_no"],
+            "student_name" => $student["student_name"],
+            "class_name" => $student["class_name"],
+            "image" => $student["image"]
+          ],
           "admission_exam_session_id" => $admission_exam_session_id,
           "url" => 'https://face.nafish.me/api/edge',
           "token" => $faceToken,
