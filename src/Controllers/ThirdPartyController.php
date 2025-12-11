@@ -35,6 +35,10 @@ class ThirdPartyController
     // Make HTTP request to get student data using HttpClient
     $client = new HttpClient();
     $client->setVerifySSL(false);
+    $client->setHeaders([
+      'User-Agent' => 'Mozilla/5.0 (compatible; Al-Ameen-Face/1.0)',
+      'Accept' => 'application/json, text/plain, */*'
+    ]);
 
     try {
       //find session id in database
@@ -63,8 +67,12 @@ class ThirdPartyController
 
       $student = null;
 
+      // Log the raw response for debugging
+      \App\Helpers\Logger::info('External API Response Status: ' . $response['status'], [], 'API');
+      \App\Helpers\Logger::info('External API Response Preview: ' . substr($response['body'], 0, 200), [], 'API');
+
       try {
-        $decoded = @$client->decodeJson($response);
+        $decoded = $client->decodeJson($response);
         $result = @$decoded['data'];
         $student = @$result[0];
       } catch (\Exception $e) {

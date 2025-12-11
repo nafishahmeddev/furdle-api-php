@@ -145,28 +145,25 @@ class HttpClient
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
     curl_setopt($ch, CURLOPT_HEADER, true);
 
-    // Set headers
-    if (!empty($this->headers)) {
-      $headerArray = [];
-      foreach ($this->headers as $key => $value) {
-        $headerArray[] = "$key: $value";
-      }
-      curl_setopt($ch, CURLOPT_HTTPHEADER, $headerArray);
-    }
-
     // Set request body for POST, PUT, DELETE
     if ($data !== null && in_array($method, ['POST', 'PUT', 'DELETE', 'PATCH'])) {
       if (is_array($data)) {
         $data = json_encode($data);
         // Add Content-Type header if not already set
         if (!isset($this->headers['Content-Type'])) {
-          curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge(
-            curl_getinfo($ch, CURLINFO_HEADER_OUT) ? [] : [],
-            ['Content-Type: application/json']
-          ));
+          $this->headers['Content-Type'] = 'application/json';
         }
       }
       curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    }
+    
+    // Set headers after all header modifications
+    if (!empty($this->headers)) {
+      $headerArray = [];
+      foreach ($this->headers as $key => $value) {
+        $headerArray[] = "$key: $value";
+      }
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $headerArray);
     }
 
     $response = curl_exec($ch);
@@ -221,10 +218,29 @@ class HttpClient
    */
   public function decodeJson(array $response)
   {
-    $decoded = json_decode($response['body'], true);
+    // Clean the response body of common issues
+    $body = $response['body'];
+    
+    // Remove BOM if present
+    $body = ltrim($body, "\xEF\xBB\xBF");
+    
+    // Trim whitespace
+    $body = trim($body);
+    
+    // Check if empty
+    if (empty($body)) {
+      throw new \Exception('Empty response body');
+    }
+    
+    // Check if it looks like JSON
+    if (substr($body, 0, 1) !== '{' && substr($body, 0, 1) !== '[') {
+      throw new \Exception('Response does not appear to be JSON. Response: ' . substr($body, 0, 200));
+    }
+    
+    $decoded = json_decode($body, true);
     
     if (json_last_error() !== JSON_ERROR_NONE) {
-      throw new \Exception('Failed to decode JSON response: ' . json_last_error_msg());
+      throw new \Exception('Failed to decode JSON response: ' . json_last_error_msg() . '. Response: ' . substr($body, 0, 200));
     }
 
     return $decoded;

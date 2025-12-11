@@ -156,6 +156,10 @@ class EventController
             // Make HTTP request to get student data using HttpClient
             $client = new HttpClient();
             $client->setVerifySSL(false);
+            $client->setHeaders([
+                'User-Agent' => 'Mozilla/5.0 (compatible; Al-Ameen-Face/1.0)',
+                'Accept' => 'application/json, text/plain, */*'
+            ]);
 
             //call api to get student details
             $response = $client->get(
@@ -168,13 +172,37 @@ class EventController
             );
 
             if ($response['status'] !== 200) {
+                \App\Helpers\Logger::error('EventController API Error - Status: ' . $response['status'] . ' Body: ' . substr($response['body'], 0, 500), [], 'API');
                 $res->status($response['status'])->json(['error' => 'API request failed', 'code' => $response['status']]);
                 return;
             }
 
-            $decoded = @$client->decodeJson($response);
-            $result = @$decoded['data'];
-            $student = @$result[0];
+            try {
+                // Clean the response body of any potential BOM or whitespace
+                $cleanBody = trim(ltrim($response['body'], "\xEF\xBB\xBF"));
+                
+                // Check if the response looks like JSON
+                if (empty($cleanBody) || (substr($cleanBody, 0, 1) !== '{' && substr($cleanBody, 0, 1) !== '[')) {
+                    \App\Helpers\Logger::error('EventController Invalid JSON response: ' . substr($cleanBody, 0, 200), [], 'API');
+                    $res->status(500)->json(['error' => 'Invalid response format from external API', 'code' => 'error']);
+                    return;
+                }
+                
+                $decoded = json_decode($cleanBody, true);
+                
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    \App\Helpers\Logger::error('EventController JSON decode error: ' . json_last_error_msg() . ' - Response: ' . substr($cleanBody, 0, 200), [], 'API');
+                    $res->status(500)->json(['error' => 'Failed to decode JSON response', 'code' => 'error']);
+                    return;
+                }
+                
+                $result = @$decoded['data'];
+                $student = @$result[0];
+            } catch (\Exception $e) {
+                \App\Helpers\Logger::error('EventController Exception: ' . $e->getMessage(), [], 'API');
+                $res->status(500)->json(['error' => 'Failed to process response', 'code' => 'error']);
+                return;
+            }
             if ($student != null) {
                 $preview = [];
                 $preview[] = ['label' => 'Name', 'value' => (string) $student['student_name']];
