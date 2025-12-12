@@ -263,6 +263,7 @@ class EventController
             }
         } else if ($event_type == "exam") {
             $exam_perm = $this->getExamPerm($event);
+            $branches = $exam_perm["branches"] ?? [];
             $student = DbHelper::selectOne("
                 SELECT 
                     s.name,
@@ -279,26 +280,38 @@ class EventController
                 ORDER BY h.asession DESC
                 LIMIT 1
             ", [$code]);
+
             if ($student != null) {
                 $code = (string) $student['registerNo'];
                 $branch = (string) $student['branch'];
                 $session = (string) $student['asession'];
                 $class = (string) $student['class'];
                 $board = (string) $student['board'];
-                $branch_details = $this->getBranchByCode($student['branch']);
-                //dynamic filed is for displaying data in future if needed
-                $preview = [];
-                $preview[] = ['label' => 'Name', 'value' => (string) $student['name']];
-                $preview[] = ["label" => "Register no", "value" => $code];
-                $preview[] = ["label" => "Branch", "value" => $branch_details["branch_name"] ?? $branch];
-                $preview[] = ["label" => "Session", "value" => $session];
-                $preview[] = ["label" => "Class", "value" => $class];
-                $preview[] = ["label" => "Board", "value" => $board];
+                //check access permission
+                $has_branch_access = in_array($student['branch'], $branches);
+                $has_class_access = false;
+                foreach ($exam_perm["classes"] as $class_perm) {
+                    if ($class_perm["session"] === $session && $class_perm["class"] === $class) {
+                        $has_class_access = true;
+                        break;
+                    }
+                }
+                if ($has_branch_access && $has_class_access) {
+                    $branch_details = $this->getBranchByCode($student['branch']);
+                    //dynamic filed is for displaying data in future if needed
+                    $preview = [];
+                    $preview[] = ['label' => 'Name', 'value' => (string) $student['name']];
+                    $preview[] = ["label" => "Register no", "value" => $code];
+                    $preview[] = ["label" => "Branch", "value" => $branch_details["branch_name"] ?? $branch];
+                    $preview[] = ["label" => "Session", "value" => $session];
+                    $preview[] = ["label" => "Class", "value" => $class];
+                    $preview[] = ["label" => "Board", "value" => $board];
 
-                $user = [
-                    "preview" => $preview,
-                ];
-                $user["perm"] = $exam_perm;
+                    $user = [
+                        "preview" => $preview,
+                    ];
+                    $user["perm"] = $exam_perm;
+                }
             }
         }
 
