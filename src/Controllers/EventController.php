@@ -165,13 +165,6 @@ class EventController
                 LIMIT 1
             ", [$code]);
             if ($student != null) {
-                $res->status(400)->json([
-                    'code' => 'error',
-                    'message' => 'Student found'
-                ]);
-                return;
-            }
-            if ($student != null) {
                 $code = (string) $student['registerNo'];
                 $branch = (string) $student['branch'];
                 $session = (string) $student['asession'];
@@ -286,13 +279,6 @@ class EventController
                 ORDER BY h.asession DESC
                 LIMIT 1
             ", [$code]);
-            if ($student != null) {
-                $res->status(400)->json([
-                    'code' => 'error',
-                    'message' => 'Student found'
-                ]);
-                return;
-            }
             if ($student != null) {
                 $code = (string) $student['registerNo'];
                 $branch = (string) $student['branch'];
