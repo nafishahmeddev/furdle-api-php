@@ -49,7 +49,8 @@ class AuthController
     $user  = [
       "id" => (string) $admin['adminId'],
       "name" => $admin["name"],
-      "username" => $admin["username"]
+      "username" => $admin["username"],
+      "adminType" => $admin["adminType"]
     ];
 
     // Generate tokens
@@ -122,7 +123,8 @@ class AuthController
     $user = [
       'id' => (string) $admin['adminId'],
       'name' => $admin["name"],
-      "username" => $admin["username"]
+      "username" => $admin["username"],
+      "adminType" => $admin["adminType"]
     ];
     $tokens = TokenHelper::generate($user);
 
@@ -163,7 +165,8 @@ class AuthController
     $user = [
       'id' => (string) $admin['adminId'],
       'name' => $admin["name"],
-      "username" => $admin["username"]
+      "username" => $admin["username"],
+      "adminType" => $admin["adminType"]
     ];
 
 
