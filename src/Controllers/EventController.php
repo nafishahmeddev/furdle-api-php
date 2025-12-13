@@ -70,12 +70,12 @@ class EventController
             }
 
             $record = [
-                "code" => (string) $event["event_code"],
+                "code" => (string) $event["events_id"],
                 "name" => (string) $event["name"],
                 'description' => (string) $event["description"],
                 'query' => $query,
                 "payload" => [
-                    "event_code" => (string) $event["event_code"],
+                    "event_id" => (string) $event["events_id"],
                 ],
             ];
             $events[] = $record;
@@ -113,12 +113,11 @@ class EventController
             ]);
             return;
         }
-        $event_code = $data['code'];
-        $type = $payload['type'];
+        $event_id = $data['code'];
         $code = $payload['code'];
 
         //find the event details from database
-        $event = DbHelper::selectOne("SELECT * FROM events WHERE event_code=? LIMIT 1", [$event_code]);
+        $event = DbHelper::selectOne("SELECT * FROM events WHERE events_id=? LIMIT 1", [$event_id]);
         if ($event == null) {
             $res->status(404)->json([
                 'code' => 'error',
