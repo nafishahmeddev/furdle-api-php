@@ -40,7 +40,7 @@ class TokenHelper
    */
   private static function getExpiry(): int
   {
-    return (int)(getenv('JWT_EXPIRY') ?: 3600);
+    return (int)(getenv('JWT_EXPIRY') ?: 24 * 60 * 60); // Default 1 day
   }
 
   /**
