@@ -345,12 +345,12 @@ class EventController
             ];
             DbHelper::insert('event_attendances', $attendance_data);
             $attendance = $attendance_data;
-        } 
+        }
         // update exit time if allowed
         else if ($attendance["dated"] == date('Y-m-d') && $has_exit && $attendance['exit_time'] == null) {
             DbHelper::update('event_attendances', ['exit_time' => date('Y-m-d H:i:s')], 'event_attendance_id=?', [$attendance['event_attendance_id']]);
             $attendance['exit_time'] = date('Y-m-d H:i:s');
-        } 
+        }
         // add new attendance for recurring
         else if ($attendance['dated'] != date('Y-m-d') && $has_recurring) {
             //mark attendance again for recurring
@@ -365,13 +365,17 @@ class EventController
         } else {
             $is_already_marked = true;
         }
-        if ($is_already_marked) {
-            $res->status(400)->json([
-                'code' => 'error',
-                'message' => 'Attendance already marked'
-            ]);
-            return;
+
+        $user["preview"][] = ["label" => "Entry Time", "value" => $attendance['entry_time']];
+        if ($attendance['exit_time'] != null) {
+            $user["preview"][] = ["label" => "Exit Time", "value" => $attendance["exit_time"]];
         }
+        if ($is_already_marked) {
+            $user["preview"][] = ["label" => "Status", "value" => "Already Marked"];
+        } else {
+            $user["preview"][] = ["label" => "Status", "value" => "Marked Successfully"];
+        }
+
 
         $res->json(MockDataHelper::apiResponse([
             'user' => $user
