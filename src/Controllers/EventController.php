@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use App\Helpers\CacheHelper;
 use App\Core\Request;
 use App\Core\Response;
+use App\Helpers\DateTimeHelper;
 use App\Helpers\DbHelper;
 use App\Helpers\MockDataHelper;
 
@@ -366,13 +367,9 @@ class EventController
             $is_already_marked = true;
         }
 
-        $entryTime = new \DateTime($attendance['entry_time']);
-        $entryTime->setTimezone(new \DateTimeZone('Asia/Kolkata'));
-        $user["preview"][] = ["label" => "Entry Time", "value" => $entryTime->format('d M Y, h:i A')];
+        $user["preview"][] = ["label" => "Entry Time", "value" => DateTimeHelper::formatHumanDateTime($attendance["entry_time"])];
         if ($attendance['exit_time'] != null) {
-            $exitTime = new \DateTime($attendance['exit_time']);
-            $exitTime->setTimezone(new \DateTimeZone('Asia/Kolkata'));
-            $user["preview"][] = ["label" => "Exit Time", "value" => $exitTime->format('d M Y, h:i A')];
+            $user["preview"][] = ["label" => "Exit Time", "value" => DateTimeHelper::formatHumanDateTime($attendance["exit_time"])];
         }
         if ($is_already_marked) {
             $user["preview"][] = ["label" => "Status", "value" => "Already Marked"];
