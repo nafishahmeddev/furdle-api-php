@@ -32,7 +32,10 @@ class AppVersionMiddleware implements Middleware
         if (!$deviceType || !in_array(strtolower($deviceType), self::VALID_DEVICE_TYPES, true)) {
             $res->status(400)->json([
                 'code' => 'error',
-                'message' => 'Invalid or missing X-Device-Type header. Must be one of: ' . implode(', ', self::VALID_DEVICE_TYPES)
+                'message' => 'Invalid or missing X-Device-Type header. Must be one of: ' . implode(', ', self::VALID_DEVICE_TYPES),
+                "result" => [
+                  "redirectUrl" => "https://example.com/downloads"
+                ]
             ]);
             return;
         }
