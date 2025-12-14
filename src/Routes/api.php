@@ -45,5 +45,5 @@ return function ($router) {
         $router->group('/third-party', function ($router) {
             $router->post('', 'App\Controllers\ThirdPartyController@index');
         });
-    }, ['App\Middlewares\JsonMiddleware', 'App\Middlewares\LoggingMiddleware', 'App\Middlewares\CorsMiddleware']);
+    }, ['App\Middlewares\JsonMiddleware', 'App\Middlewares\LoggingMiddleware', 'App\Middlewares\CorsMiddleware', 'App\Middlewares\AppVersionMiddleware']);
 };

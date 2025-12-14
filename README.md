@@ -110,6 +110,11 @@ The application will be available at `http://localhost:8080`
 
 ## API Documentation
 
+All API endpoints require the following headers for app version validation:
+
+- `X-Device-Type`: Device type (ios, android, linux, macos, windows)
+- `X-App-Build-Number`: Build number (minimum varies by platform: iOS >= 100, Android >= 50, others >= 1)
+
 ### Authentication Endpoints
 
 #### POST `/api/auth/login`
@@ -207,7 +212,7 @@ The React frontend provides a face registration interface:
 
 - **Request/Response Objects**: Encapsulate HTTP data with helper methods
 
-- **Middleware System**: Supports global and route-specific middleware
+- **Middleware System**: Supports global and route-specific middleware (CORS, JSON validation, logging, authentication, app version check)
 
 - **Database Layer**: Direct SQL queries with helper functions
 
