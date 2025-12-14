@@ -1,178 +1,296 @@
-# Auto Router
+# Al-Ameen Face API
 
-A lightweight PHP auto-router inspired by Express.js, featuring dynamic parameters, middleware support, and PSR-4 autoloading.
+A comprehensive face recognition API system for Al-Ameen educational institution, built with PHP auto-router, featuring user authentication, event management, and face registration capabilities.
 
 ## Features
 
-- **Dynamic Routing**: Support for parameterized routes like `/user/{id}`
-- **Middleware**: Chain middleware functions before route handlers
-- **Controller Support**: Use `Controller@method` syntax with autoloading
-- **PSR-4 Autoloading**: Industry-standard namespace mapping
-- **Type Safety**: Strict typing and modern PHP features
+- **Face Recognition Integration**: Seamless integration with external face recognition services for student and admin identification
+- **User Management**: Support for students and admins with branch-based organization
+- **Event System**: Attendance tracking and event management with face verification
+- **Auto Router**: Lightweight PHP router with middleware support, PSR-4 autoloading, and dynamic parameters
+- **Authentication**: JWT-based authentication with role-based permissions
+- **Third-Party Integration**: API endpoints for external face capture services
+- **Modern Frontend**: React-based registration interface with real-time face capture
+- **Docker Support**: Containerized deployment with nginx and PHP-FPM
 
 ## Project Structure
 
 ```
 ├── src/
-│   ├── Core/           # Core classes (AutoRouter, Request, Response)
-│   ├── Controllers/    # Application controllers
-│   └── Routes/         # Route definitions
-├── bootstrap.php       # Application entry point
-├── composer.json       # Dependencies and autoload config
-└── README.md
+│   ├── Controllers/          # API controllers (Auth, User, Event, etc.)
+│   ├── Core/                 # Core framework classes (AutoRouter, Request, Response)
+│   ├── Helpers/              # Utility helpers (DB, Token, Face API, etc.)
+│   ├── Middlewares/          # Request middlewares (Auth, CORS, JSON, Logging)
+│   ├── Routes/               # Route definitions
+│   └── Views/                # Template views
+├── frontend/                 # React frontend application
+│   ├── src/
+│   │   ├── components/       # React components
+│   │   ├── pages/           # Page components (Home, Register)
+│   │   ├── utils/           # API utilities
+│   │   └── @types/          # TypeScript type definitions
+│   └── public/              # Static assets
+├── bootstrap.php             # Application entry point
+├── composer.json             # PHP dependencies
+├── Dockerfile                # Docker container configuration
+├── docker-compose.yml        # Docker services orchestration
+├── nginx.conf                # Nginx web server configuration
+└── Makefile                  # Docker management commands
 ```
 
 ## Installation
 
-1. Install dependencies:
+### Prerequisites
+
+- PHP 7.3+
+- Composer
+- Node.js 16+ (for frontend)
+- Docker & Docker Compose (optional, for containerized deployment)
+- MySQL database
+
+### Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd al-ameen-face
+   ```
+
+2. **Install PHP dependencies:**
    ```bash
    composer install
    ```
 
-2. Start the development server:
+3. **Install frontend dependencies:**
    ```bash
-   composer run serve
-   # or
-   php -S localhost:8000 bootstrap.php
+   cd frontend
+   npm install
+   cd ..
    ```
 
-## Usage
+4. **Environment Configuration:**
+   Create a `.env` file in the root directory with required environment variables:
+   ```env
+   DB_HOST=localhost
+   DB_NAME=al_ameen_db
+   DB_USER=your_db_user
+   DB_PASS=your_db_password
+   JWT_SECRET=your_jwt_secret
+   FACE_API_URL=https://face.nafish.me
+   ```
 
-### Defining Routes
+5. **Database Setup:**
+   Import the database schema and initial data.
 
-Routes are defined in `src/Routes/*.php` files. Each file should return a callable that receives the router instance:
+### Running the Application
 
-```php
-<?php
-return function($router) {
-    // Global logging middleware
-    $router->use(function($req, $res, $next) {
-        error_log('Request: ' . $req->method . ' ' . $req->path);
-        $next();
-    });
+#### Development Mode
 
-    // Route groups with middleware
-    $router->group('/api', function($router) {
-        $router->get('/users', 'UserController@index');
-        $router->post('/users', 'UserController@store');
-    }, [function($req, $res, $next) {
-        // API authentication middleware
-        if (!$req->header('Authorization')) {
-            $res->status(401)->send('Unauthorized');
-            return;
-        }
-        $next();
-    }]);
-
-    // Simple route
-    $router->get('/', function($req, $res) {
-        $res->send('Hello World!');
-    });
-
-    // Route with parameters
-    $router->get('/user/{id}', function($req, $res) {
-        $id = $req->param('id');
-        $res->json(['user_id' => $id]);
-    });
-
-    // Controller route
-    $router->get('/user/{id}/profile', 'UserController@show');
-
-    // Route with middleware
-    $router->get('/protected', function($req, $res) {
-        $res->send('Secret content');
-    }, [function($req, $res, $next) {
-        if ($req->header('Authorization') !== 'secret') {
-            $res->status(401)->send('Unauthorized');
-            return;
-        }
-        $next();
-    }]);
-};
+**Backend:**
+```bash
+composer run serve
+# or
+php -S localhost:8000 bootstrap.php
 ```
 
-### Controllers
+**Frontend:**
+```bash
+cd frontend
+npm run dev
+```
 
-Controllers should be placed in `src/Controllers/` and follow PSR-4 naming:
+#### Production Mode (Docker)
 
-```php
-<?php
-namespace App\Controllers;
+```bash
+make build
+make up
+```
 
-use App\Request;
-use App\Response;
+The application will be available at `http://localhost:8080`
 
-class UserController
+## API Documentation
+
+### Authentication Endpoints
+
+#### POST `/api/auth/login`
+Authenticate admin users.
+```json
 {
-    public function show(Request $req, Response $res): void
-    {
-        $id = $req->param('id');
-        $res->json(['message' => 'User profile', 'id' => $id]);
-    }
+  "username": "admin_username",
+  "password": "admin_password"
 }
 ```
 
-### Request Object
+#### POST `/api/auth/token`
+Generate authentication token.
 
-The `Request` object provides access to HTTP request data:
+#### GET `/api/auth/verify`
+Verify authentication token (requires AuthMiddleware).
 
-- `$req->method`: HTTP method
-- `$req->path`: Request path
-- `$req->query`: Query parameters
-- `$req->body`: Raw request body
-- `$req->headers`: Request headers
-- `$req->params`: Route parameters
-- `$req->param('name')`: Get route parameter
-- `$req->query('name')`: Get query parameter
-- `$req->header('name')`: Get header
-- `$req->json()`: Parse JSON body
+### User Management
 
-### Response Object
-
-The `Response` object handles HTTP responses:
-
-- `$res->status(404)`: Set status code
-- `$res->header('Content-Type', 'application/json')`: Set header
-- `$res->send('data')`: Send text response
-- `$res->json(['key' => 'value'])`: Send JSON response
-- `$res->redirect('/path')`: Redirect
-
-### Route Groups
-
-Group routes with shared prefixes and middleware:
-
-```php
-$router->group('/admin', function($router) {
-    $router->get('/users', 'AdminController@users');
-    $router->post('/users', 'AdminController@createUser');
-}, [function($req, $res, $next) {
-    // Admin authentication middleware
-    if (!isAdmin($req)) {
-        $res->status(403)->send('Admin access required');
-        return;
-    }
-    $next();
-}]);
+#### POST `/api/users/types`
+Get available user types.
+```json
+{
+  "types": [
+    {"value": "student", "label": "Student"},
+    {"value": "admin", "label": "Employee"}
+  ]
+}
 ```
 
-Groups can be nested and inherit middleware from parent groups.
+#### POST `/api/users/lookup`
+Lookup user by type and code.
+```json
+{
+  "type": "student|admin",
+  "code": "user_code"
+}
+```
 
-## Examples
+#### POST `/api/users/register`
+Register new user.
 
-Visit these URLs after starting the server:
+### Event Management
 
-- `http://localhost:8000/` → Hello message
-- `http://localhost:8000/user` → User list (requires `User-Auth: valid` header)
-- `http://localhost:8000/user/123` → User ID display
-- `http://localhost:8000/user/123/post/456` → User and post params
-- `http://localhost:8000/user/ctrl/123` → Controller response
-- `http://localhost:8000/api/data` → API data (requires `API-Key: secret` header)
-- `http://localhost:8000/protected` → 401 unless `Authorization: secret` header
+#### POST `/api/events`
+Get events list (requires authentication).
+
+#### POST `/api/events/attend`
+Mark attendance for an event (requires authentication).
+
+### Third-Party Integration
+
+#### POST `/api/third-party`
+Lookup student information for face registration.
+```json
+{
+  "form_no": "student_form_number",
+  "session": "academic_session"
+}
+```
+
+### Webhooks
+
+#### POST `/api/webhooks/event`
+Handle external event webhooks.
+
+## Frontend Usage
+
+The React frontend provides a face registration interface:
+
+1. **Home Page** (`/`): Access control page
+2. **Registration Page** (`/register`): Face registration with parameters
+   - `form_no`: Student form number
+   - `session`: Academic session
+   - `redirect`: Redirect URL after registration
+
+### Face Registration Flow
+
+1. User accesses registration URL with parameters
+2. System looks up student information via third-party API
+3. Face capture iframe loads from external service
+4. User captures face image
+5. System registers face with face recognition API
+6. Success/failure feedback displayed
+
+## Architecture
+
+### Backend (PHP)
+
+- **AutoRouter**: Custom lightweight router supporting:
+  - Dynamic route parameters (`{id}`)
+  - Middleware chains
+  - Route groups
+  - Controller method routing (`Controller@method`)
+
+- **Request/Response Objects**: Encapsulate HTTP data with helper methods
+
+- **Middleware System**: Supports global and route-specific middleware
+
+- **Database Layer**: Direct SQL queries with helper functions
+
+### Frontend (React + TypeScript)
+
+- **React Router**: Client-side routing
+- **Axios**: HTTP client for API communication
+- **React Query**: Data fetching and caching
+- **Tailwind CSS + DaisyUI**: Styling framework
+- **Vite**: Build tool and development server
+
+### Face Recognition Integration
+
+- External face API service for:
+  - Face registration
+  - Face search
+  - Face deletion
+- Secure token-based authentication
+- Image upload and processing
+
+## Database Schema
+
+Key tables:
+- `admin`: Administrative users
+- `student`: Student records
+- `branch`: Branch information
+- `history`: Student academic history
+- `events`: Event definitions
+- `attendance`: Attendance records
+
+## Security
+
+- JWT token authentication
+- Role-based access control
+- CORS protection
+- Input validation and sanitization
+- Secure file upload handling
+
+## Development
+
+### Adding New Routes
+
+1. Define routes in `src/Routes/api.php`
+2. Create controller methods in appropriate controller
+3. Add middleware if required
+
+### Adding New Controllers
+
+1. Create class in `src/Controllers/`
+2. Follow PSR-4 naming: `App\Controllers\ControllerName`
+3. Implement methods with `Request` and `Response` parameters
+
+### Frontend Development
+
+1. Add components in `frontend/src/components/`
+2. Add pages in `frontend/src/pages/`
+3. Update routes in `Router.tsx`
+4. Use API service in `utils/api.ts`
+
+## Deployment
+
+### Docker Deployment
+
+```bash
+make build
+make up
+```
+
+### Manual Deployment
+
+1. Configure web server (nginx/apache)
+2. Set up PHP-FPM
+3. Configure environment variables
+4. Run database migrations
+5. Build frontend assets: `cd frontend && npm run build`
 
 ## Requirements
 
-- PHP 8.0+
-- Composer (for autoloading)
+- PHP 7.3+
+- MySQL 5.7+
+- Node.js 16+
+- Composer
+- Docker (optional)
 
 ## License
 
