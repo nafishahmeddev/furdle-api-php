@@ -58,7 +58,7 @@ class EventController
         $admin_id = $auth->id;
         //get list of events from database
         $events_data = DbHelper::select("SELECT e.* FROM events e
-            INNER JOIN event_permissions ep ON ep.event_id = e.events_id AND ep.admin_id = ?
+            INNER JOIN event_permissions ep ON ep.event_id = e.event_id AND ep.admin_id = ?
         WHERE e.active_status='Active' ORDER BY `e`.`priority` DESC", [$admin_id]);
         $events = [];
         foreach ($events_data as $event) {
@@ -75,12 +75,12 @@ class EventController
             }
 
             $record = [
-                "code" => (string) $event["events_id"],
+                "code" => (string) $event["event_id"],
                 "name" => (string) $event["name"],
                 'description' => (string) $event["description"],
                 'query' => $query,
                 "payload" => [
-                    "event_id" => (string) $event["events_id"],
+                    "event_id" => (string) $event["event_id"],
                 ],
             ];
             $events[] = $record;
@@ -122,7 +122,7 @@ class EventController
         $code = $payload['code'];
 
         //find the event details from database
-        $event = DbHelper::selectOne("SELECT * FROM events WHERE events_id=? LIMIT 1", [$event_id]);
+        $event = DbHelper::selectOne("SELECT * FROM events WHERE event_id=? LIMIT 1", [$event_id]);
         if ($event == null) {
             $res->status(404)->json([
                 'code' => 'error',
@@ -339,11 +339,11 @@ class EventController
         $has_recurring = $event["allow_recurring"] == "Yes" ? true : false;
 
         //find attendance and mark attendance if not marked already
-        $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND user_code=? ORDER BY dated DESC LIMIT 1", [$event['events_id'], $code]);
+        $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND user_code=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $code]);
         if ($attendance == null) {
             //mark attendance
             $attendance_data = [
-                'event_id' => $event['events_id'],
+                'event_id' => $event['event_id'],
                 'user_code' => $code,
                 'entry_time' => date('Y-m-d H:i:s'),
                 'dated' => date('Y-m-d'),
@@ -360,7 +360,7 @@ class EventController
         else if ($attendance['dated'] != date('Y-m-d') && $has_recurring) {
             //mark attendance again for recurring
             $attendance_data = [
-                'event_id' => $event['events_id'],
+                'event_id' => $event['event_id'],
                 'user_code' => $code,
                 'entry_time' => date('Y-m-d H:i:s'),
                 'dated' => date('Y-m-d'),
