@@ -372,7 +372,7 @@ class EventController
         }
 
         $user["preview"][] = ["label" => "Entry Time", "value" => DateTimeHelper::formatHumanDateTime($attendance["entry_time"])];
-        if ($attendance['exit_time'] != null) {
+        if (isset($attendance['exit_time']) && $attendance['exit_time'] != null) {
             $user["preview"][] = ["label" => "Exit Time", "value" => DateTimeHelper::formatHumanDateTime($attendance["exit_time"])];
         }
         if ($is_already_marked) {
