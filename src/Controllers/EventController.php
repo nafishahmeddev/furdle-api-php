@@ -265,12 +265,12 @@ class EventController
                     SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board
                     FROM student AS s
                     INNER JOIN history AS h ON h.studentId = s.studentId
-                    INNER JOIN exam_group_class_access AS egca ON egca.asession = h.asession AND egca.class = h.class
+                    INNER JOIN exam_group_class_access AS egca ON egca.asession = h.asession AND egca.class = h.class AND egca.exam_group_id = ?
                     INNER JOIN exam_group eg ON egca.exam_group_id = eg.exam_group_id
                     INNER JOIN exam e ON eg.examId = e.examId AND FIND_IN_SET(h.branch_code, e.branch_codes)
-                    WHERE s.registerNo = ? AND egca.exam_group_id = ?
+                    WHERE s.registerNo = ?
                     ORDER BY h.asession DESC LIMIT 1
-                ", [$code, $event['exam_group_id']]);
+                ", [$event['exam_group_id'], $code]);
 
                 if (!$student) {
                     throw new \Exception('User not found', 404);
