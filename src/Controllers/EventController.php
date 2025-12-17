@@ -148,16 +148,17 @@ class EventController
             [$event['event_id'], $code]
         );
 
-        if (!$attendance) {
-            if ($direction === 'exit') {
-                $res->status(400)->json([
-                    'code' => 'error',
-                    'message' => 'No active entry found to exit'
-                ]);
-                return;
-            }
+        //return if no attendance is found and direction is exit
+        if (!$attendance && $direction === 'exit') {
+            $res->status(400)->json([
+                'code' => 'error',
+                'message' => 'No active entry found to exit'
+            ]);
+            return;
+        }
 
-            // Create new attendance
+        // Create new attendance
+        if (!$attendance) {
             $attendance = [
                 'event_id' => $event['event_id'],
                 'user_code' => $code,
@@ -166,39 +167,35 @@ class EventController
             ];
             DbHelper::insert('event_attendances', $attendance);
             $can_exit = $is_exit_allowed;
-        } elseif ($direction === 'exit') {
-            // Processing Exit
-            if ($attendance["dated"] !== $active_date) {
-                $res->status(400)->json([
-                    'code' => 'error',
-                    'message' => 'No active entry found to exit'
-                ]);
-                return;
-            }
-
-            if ($is_exit_allowed && $attendance['exit_time'] === null) {
-                DbHelper::update(
-                    'event_attendances',
-                    ['exit_time' => $timestamp],
-                    'event_attendance_id=?',
-                    [$attendance['event_attendance_id']]
-                );
-                $attendance['exit_time'] = $timestamp;
-            } else {
-                $is_already_marked = true;
-            }
+        }
+        // Processing Entry (Recurring check)
+        elseif ($active_date !== $attendance['dated'] && $is_recurring_allowed) {
+            $attendance = [
+                'event_id' => $event['event_id'],
+                'user_code' => $code,
+                'entry_time' => $timestamp,
+                'dated' => $active_date,
+            ];
+            DbHelper::insert('event_attendances', $attendance);
+            $can_exit = $is_exit_allowed;
+        }
+        // Processing Exit
+        elseif ($direction === 'exit' && $active_date == $attendance['dated'] && $is_exit_allowed) {
+            DbHelper::update(
+                'event_attendances',
+                ['exit_time' => $timestamp],
+                'event_attendance_id=?',
+                [$attendance['event_attendance_id']]
+            );
+            $attendance['exit_time'] = $timestamp;
+        } else if ($active_date == $attendance['dated']) {
+            $is_already_marked = true;
         } else {
-            // Processing Entry (Recurring check)
-            if ($attendance['dated'] !== $active_date && $is_recurring_allowed) {
-                $attendance = [
-                    'event_id' => $event['event_id'],
-                    'user_code' => $code,
-                    'entry_time' => $timestamp,
-                    'dated' => $active_date,
-                ];
-                DbHelper::insert('event_attendances', $attendance);
-                $can_exit = $is_exit_allowed;
-            }
+            $res->status(400)->json([
+                'code' => 'error',
+                'message' => 'Event is not active for this date'
+            ]);
+            return;
         }
 
         // Prepare response
