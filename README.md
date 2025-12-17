@@ -1,302 +1,129 @@
-# Al-Ameen Face API
+# Al Ameen Face - Event Management System
 
-A comprehensive face recognition API system for Al-Ameen educational institution, built with PHP auto-router, featuring user authentication, event management, and face registration capabilities.
+A comprehensive Event Management and Attendance Tracking system built with a custom PHP backend and a modern React frontend. This system is designed to handle various event types (Admission, Exam, Student, Admin) with integrated attendance tracking and permission management.
 
-## Features
+## 🚀 Tech Stack
 
-- **Face Recognition Integration**: Seamless integration with external face recognition services for student and admin identification
-- **User Management**: Support for students and admins with branch-based organization
-- **Event System**: Attendance tracking and event management with face verification
-- **Auto Router**: Lightweight PHP router with middleware support, PSR-4 autoloading, and dynamic parameters
-- **Authentication**: JWT-based authentication with role-based permissions
-- **Third-Party Integration**: API endpoints for external face capture services
-- **Modern Frontend**: React-based registration interface with real-time face capture
-- **Docker Support**: Containerized deployment with nginx and PHP-FPM
+### Backend
+*   **Language**: PHP >= 7.3
+*   **Framework**: Custom Lightweight Auto-Router (PSR-4 Autoloading)
+*   **Database**: MySQL
+*   **Authentication**: JWT (JSON Web Tokens)
+*   **Logging**: Monolog
+*   **HTTP Client**: Guzzle
 
-## Project Structure
+### Frontend
+*   **Framework**: React 19 (via Vite)
+*   **Language**: TypeScript
+*   **Styling**: TailwindCSS v4, DaisyUI
+*   **State Management**: TanStack Query
+*   **Routing**: React Router
 
-```
-├── src/
-│   ├── Controllers/          # API controllers (Auth, User, Event, etc.)
-│   ├── Core/                 # Core framework classes (AutoRouter, Request, Response)
-│   ├── Helpers/              # Utility helpers (DB, Token, Face API, etc.)
-│   ├── Middlewares/          # Request middlewares (Auth, CORS, JSON, Logging)
-│   ├── Routes/               # Route definitions
-│   └── Views/                # Template views
-├── frontend/                 # React frontend application
-│   ├── src/
-│   │   ├── components/       # React components
-│   │   ├── pages/           # Page components (Home, Register)
-│   │   ├── utils/           # API utilities
-│   │   └── @types/          # TypeScript type definitions
-│   └── public/              # Static assets
-├── bootstrap.php             # Application entry point
-├── composer.json             # PHP dependencies
-├── Dockerfile                # Docker container configuration
-├── docker-compose.yml        # Docker services orchestration
-├── nginx.conf                # Nginx web server configuration
-└── Makefile                  # Docker management commands
-```
+## ✨ Key Features
 
-## Installation
+*   **Multi-Type Event Management**: Supports specific workflows for different event types:
+    *   `admission`: Linked to admission exam sessions.
+    *   `exam`: Linked to exam groups.
+    *   `student`: Linked to branch, session, and class.
+    *   `admin`: Linked to specific branches.
+*   **Attendance Tracking**:
+    *   Records entry and exit times.
+    *   Validates user codes (Student Register No, Admin Username, Admission Form No).
+*   **Permission System**:
+    *   Granular event-based permissions.
+    *   Creators manage access for other admins.
+*   **Face API Integration**: Integration with external Face Recognition API for user verification.
+
+## 🛠️ Installation & Setup
 
 ### Prerequisites
+*   PHP >= 7.3
+*   Composer
+*   Node.js & npm
+*   MySQL
 
-- PHP 7.3+
-- Composer
-- Node.js 16+ (for frontend)
-- Docker & Docker Compose (optional, for containerized deployment)
-- MySQL database
+### 1. Backend Setup
 
-### Setup
+1.  **Clone the repository**:
+    ```bash
+    git clone <repository_url>
+    cd al-ameen-face
+    ```
 
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd al-ameen-face
-   ```
+2.  **Install PHP dependencies**:
+    ```bash
+    composer install
+    ```
 
-2. **Install PHP dependencies:**
-   ```bash
-   composer install
-   ```
+3.  **Environment Configuration**:
+    Copy the example environment file and configure it:
+    ```bash
+    cp .env.example .env
+    ```
+    Update `.env` with your database credentials and API keys.
 
-3. **Install frontend dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   cd ..
-   ```
+4.  **Database Setup**:
+    Ensure your MySQL server is running and create a database named `al_ameen_face` (or whatever you specified in `.env`). Import the necessary SQL schema (if available in the repo).
 
-4. **Environment Configuration:**
-   Create a `.env` file in the root directory with required environment variables:
-   ```env
-   DB_HOST=localhost
-   DB_NAME=al_ameen_db
-   DB_USER=your_db_user
-   DB_PASS=your_db_password
-   JWT_SECRET=your_jwt_secret
-   FACE_API_URL=https://face.nafish.me
-   ```
+5.  **Start the Server**:
+    ```bash
+    composer run serve
+    # OR directly:
+    php -S localhost:8000 bootstrap.php
+    ```
 
-5. **Database Setup:**
-   Import the database schema and initial data.
+### 2. Frontend Setup
 
-### Running the Application
+1.  **Navigate to the frontend directory**:
+    ```bash
+    cd frontend
+    ```
 
-#### Development Mode
+2.  **Install Node dependencies**:
+    ```bash
+    npm install
+    ```
 
-**Backend:**
-```bash
-composer run serve
-# or
-php -S localhost:8000 bootstrap.php
-```
+3.  **Start the Development Server**:
+    ```bash
+    npm run dev
+    ```
+    The frontend will typically run on `http://localhost:5173`.
 
-**Frontend:**
-```bash
-cd frontend
-npm run dev
-```
+### 3. Docker Setup (Optional)
 
-#### Production Mode (Docker)
+A `docker-compose.yml` file is provided for containerized deployment.
 
 ```bash
-make build
-make up
+docker-compose up -d --build
 ```
 
-The application will be available at `http://localhost:8080`
+## ⚙️ Environment Variables
 
-## API Documentation
+The application is configured via `.env`. Key variables include:
 
-All API endpoints require the following headers for app version validation:
+| Category | Variable | Description |
+| :--- | :--- | :--- |
+| **Database** | `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS` | MySQL connection details. |
+| **App** | `APP_ENV`, `APP_DEBUG`, `APP_URL` | Application environment settings. |
+| **Auth** | `JWT_SECRET`, `JWT_ALGORITHM` | JWT signing configuration. |
+| **Face API** | `FACE_API_URL`, `FACE_API_TOKEN` | External Face API credentials. |
+| **Logging** | `LOG_LEVEL` | Logging verbosity (e.g., debug, error). |
 
-- `X-Device-Type`: Device type (ios, android, linux, macos, windows)
-- `X-App-Build-Number`: Build number (minimum varies by platform: iOS >= 100, Android >= 50, others >= 1)
+## 📂 Project Structure
 
-### Authentication Endpoints
+*   `src/`: Backend source code.
+    *   `Controllers/`: Handles API requests.
+    *   `Core/`: Core framework logic (Router, Request, Response).
+    *   `Middlewares/`: Request filtering (Auth, CORS).
+    *   `Helpers/`: Utility functions and Database wrappers.
+*   `frontend/`: React frontend application.
+*   `public/`: Public assets for the backend.
+*   `logs/`: Application logs.
 
-#### POST `/api/auth/login`
-Authenticate admin users.
-```json
-{
-  "username": "admin_username",
-  "password": "admin_password"
-}
-```
+## 📝 License
 
-#### POST `/api/auth/token`
-Generate authentication token.
+Copyright (c) 2024 Al Ameen Mission. All Rights Reserved.
 
-#### GET `/api/auth/verify`
-Verify authentication token (requires AuthMiddleware).
+This project is proprietary software. Unauthorized copying, modification, distribution, or use of this file, via any medium, is strictly prohibited.
 
-### User Management
-
-#### POST `/api/users/types`
-Get available user types.
-```json
-{
-  "types": [
-    {"value": "student", "label": "Student"},
-    {"value": "admin", "label": "Employee"}
-  ]
-}
-```
-
-#### POST `/api/users/lookup`
-Lookup user by type and code.
-```json
-{
-  "type": "student|admin",
-  "code": "user_code"
-}
-```
-
-#### POST `/api/users/register`
-Register new user.
-
-### Event Management
-
-#### POST `/api/events`
-Get events list (requires authentication).
-
-#### POST `/api/events/attend`
-Mark attendance for an event (requires authentication).
-
-### Third-Party Integration
-
-#### POST `/api/third-party`
-Lookup student information for face registration.
-```json
-{
-  "form_no": "student_form_number",
-  "session": "academic_session"
-}
-```
-
-### Webhooks
-
-#### POST `/api/webhooks/event`
-Handle external event webhooks.
-
-## Frontend Usage
-
-The React frontend provides a face registration interface:
-
-1. **Home Page** (`/`): Access control page
-2. **Registration Page** (`/register`): Face registration with parameters
-   - `form_no`: Student form number
-   - `session`: Academic session
-   - `redirect`: Redirect URL after registration
-
-### Face Registration Flow
-
-1. User accesses registration URL with parameters
-2. System looks up student information via third-party API
-3. Face capture iframe loads from external service
-4. User captures face image
-5. System registers face with face recognition API
-6. Success/failure feedback displayed
-
-## Architecture
-
-### Backend (PHP)
-
-- **AutoRouter**: Custom lightweight router supporting:
-  - Dynamic route parameters (`{id}`)
-  - Middleware chains
-  - Route groups
-  - Controller method routing (`Controller@method`)
-
-- **Request/Response Objects**: Encapsulate HTTP data with helper methods
-
-- **Middleware System**: Supports global and route-specific middleware (CORS, JSON validation, logging, authentication, app version check)
-
-- **Database Layer**: Direct SQL queries with helper functions
-
-### Frontend (React + TypeScript)
-
-- **React Router**: Client-side routing
-- **Axios**: HTTP client for API communication
-- **React Query**: Data fetching and caching
-- **Tailwind CSS + DaisyUI**: Styling framework
-- **Vite**: Build tool and development server
-
-### Face Recognition Integration
-
-- External face API service for:
-  - Face registration
-  - Face search
-  - Face deletion
-- Secure token-based authentication
-- Image upload and processing
-
-## Database Schema
-
-Key tables:
-- `admin`: Administrative users
-- `student`: Student records
-- `branch`: Branch information
-- `history`: Student academic history
-- `events`: Event definitions
-- `attendance`: Attendance records
-
-## Security
-
-- JWT token authentication
-- Role-based access control
-- CORS protection
-- Input validation and sanitization
-- Secure file upload handling
-
-## Development
-
-### Adding New Routes
-
-1. Define routes in `src/Routes/api.php`
-2. Create controller methods in appropriate controller
-3. Add middleware if required
-
-### Adding New Controllers
-
-1. Create class in `src/Controllers/`
-2. Follow PSR-4 naming: `App\Controllers\ControllerName`
-3. Implement methods with `Request` and `Response` parameters
-
-### Frontend Development
-
-1. Add components in `frontend/src/components/`
-2. Add pages in `frontend/src/pages/`
-3. Update routes in `Router.tsx`
-4. Use API service in `utils/api.ts`
-
-## Deployment
-
-### Docker Deployment
-
-```bash
-make build
-make up
-```
-
-### Manual Deployment
-
-1. Configure web server (nginx/apache)
-2. Set up PHP-FPM
-3. Configure environment variables
-4. Run database migrations
-5. Build frontend assets: `cd frontend && npm run build`
-
-## Requirements
-
-- PHP 7.3+
-- MySQL 5.7+
-- Node.js 16+
-- Composer
-- Docker (optional)
-
-## License
-
-MIT

@@ -2,7 +2,7 @@
   "name": "al-ameen-face/autorouter",
   "description": "Small auto router with PSR-4 autoload for App namespace",
   "type": "project",
-  "license": "MIT",
+  "license": "proprietary",
   "authors": [
     {
       "name": "Your Name",
