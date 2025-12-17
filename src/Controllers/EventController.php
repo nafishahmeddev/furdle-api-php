@@ -23,29 +23,6 @@ class EventController
         return $branch ?: null;
     }
 
-    protected function getExamPerm($event): ?array
-    {
-        $exam_group_id = $event["exam_group_id"];
-        $sql = "SELECT egca.asession as session, egca.class, e.branch_codes  as branches 
-            FROM exam_group_class_access egca 
-	            INNER JOIN exam_group eg ON eg.exam_group_id =egca.exam_group_id
-	            INNER JOIN exam e ON e.examId =eg.examId 
-            WHERE egca.exam_group_id=?";
-        $exam_perm = DbHelper::select($sql, [$exam_group_id]);
-        $branches = json_decode($exam_perm[0]["branches"] ?? "[]", true);
-        $classes = array_map(function ($item) {
-            return [
-                "session" => $item["session"],
-                "class" => $item["class"]
-            ];
-        }, $exam_perm);
-
-        $result = [
-            "branches" => $branches,
-            "classes" => $classes
-        ];
-        return $result;
-    }
     /**
      * Get list of events/attendance records.
      *
@@ -259,7 +236,7 @@ class EventController
                 $student = DbHelper::selectOne("
                     SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board
                     FROM student AS s
-                    LEFT JOIN history AS h ON h.studentId = s.studentId
+                    INNER JOIN history AS h ON h.studentId = s.studentId
                     WHERE s.registerNo = ?
                     ORDER BY h.asession DESC LIMIT 1
                 ", [$code]);
@@ -287,10 +264,13 @@ class EventController
                 $student = DbHelper::selectOne("
                     SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board
                     FROM student AS s
-                    LEFT JOIN history AS h ON h.studentId = s.studentId
-                    WHERE s.registerNo = ?
+                    INNER JOIN history AS h ON h.studentId = s.studentId
+                    INNER JOIN exam_group_class_access AS egca ON egca.asession = h.asession AND egca.class = h.class
+                    INNER JOIN exam_group eg ON egca.exam_group_id = eg.exam_group_id
+                    INNER JOIN exam e ON eg.examId = e.examId AND FIND_IN_SET(h.branch_code, e.branch_codes)
+                    WHERE s.registerNo = ? AND egca.exam_group_id = ?
                     ORDER BY h.asession DESC LIMIT 1
-                ", [$code]);
+                ", [$code, $event['exam_group_id']]);
 
                 if (!$student) {
                     throw new \Exception('User not found', 404);
@@ -309,27 +289,9 @@ class EventController
                     ["label" => "Board", "value" => (string) $student['board']]
                 ];
 
-                // Exam logic
-                $examPerm = $this->getExamPerm($event);
-                $allowedBranches = $examPerm["branches"] ?? [];
-
-                $hasBranchAccess = in_array($branchCode, $allowedBranches);
-                $hasClassAccess = false;
-
-                foreach ($examPerm["classes"] as $classPerm) {
-                    if ($classPerm["session"] === (string) $student['asession'] && $classPerm["class"] === (string) $student['class']) {
-                        $hasClassAccess = true;
-                        break;
-                    }
-                }
-
-                if (!$hasBranchAccess || !$hasClassAccess) {
-                    throw new \Exception('Access denied for this student', 403);
-                }
 
                 return [
-                    "preview" => $preview,
-                    "perm" => $examPerm
+                    "preview" => $preview
                 ];
 
             case 'admission':
