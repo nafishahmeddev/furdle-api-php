@@ -135,9 +135,10 @@ class EventController
         }
 
         // Check event settings
-        $has_exit = $event["allow_exit"] === "Yes";
-        $has_recurring = $event["allow_recurring"] === "Yes";
+        $is_exit_allowed = $event["allow_exit"] === "Yes";
+        $is_recurring_allowed = $event["allow_recurring"] === "Yes";
         $is_already_marked = false;
+        $can_exit = false;
         $active_date = date('Y-m-d');
         $timestamp = date('Y-m-d H:i:s');
 
@@ -174,7 +175,7 @@ class EventController
                 return;
             }
 
-            if ($has_exit && $attendance['exit_time'] === null) {
+            if ($is_exit_allowed && $attendance['exit_time'] === null) {
                 DbHelper::update(
                     'event_attendances', 
                     ['exit_time' => $timestamp], 
@@ -187,7 +188,7 @@ class EventController
             }
         } else {
             // Processing Entry (Recurring check)
-            if ($attendance['dated'] !== $active_date && $has_recurring) {
+            if ($attendance['dated'] !== $active_date && $is_recurring_allowed) {
                 $attendance = [
                     'event_id' => $event['event_id'],
                     'user_code' => $code,
@@ -195,8 +196,6 @@ class EventController
                     'dated' => $active_date,
                 ];
                 DbHelper::insert('event_attendances', $attendance);
-            } else {
-                $is_already_marked = true;
             }
         }
 
@@ -214,7 +213,7 @@ class EventController
 
         $responseData = ['user' => $user];
         if ($direction === 'entry') {
-            $responseData['canExit'] = $has_exit && @$attendance['exit_time'] === null;
+            $responseData['canExit'] = $can_exit;
         }
 
         $res->json(MockDataHelper::apiResponse($responseData, 'User retrieved successfully'));
