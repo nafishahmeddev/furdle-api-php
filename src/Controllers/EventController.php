@@ -214,7 +214,7 @@ class EventController
 
         $responseData = ['user' => $user];
         if ($direction === 'entry') {
-            $responseData['canExit'] = $has_exit && $attendance['exit_time'] === null;
+            $responseData['canExit'] = $has_exit && @$attendance['exit_time'] === null;
         }
 
         $res->json(MockDataHelper::apiResponse($responseData, 'User retrieved successfully'));
