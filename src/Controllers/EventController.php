@@ -122,13 +122,13 @@ class EventController
         //user payload
         $attendance = null;
         if ($event['event_type'] === 'admin') {
-            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND adminId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['adminId']]);
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND adminId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['data_to_save']['adminId']]);
         } elseif ($event['event_type'] === 'student') {
-            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND studentId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['studentId']]);
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND studentId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['data_to_save']['studentId']]);
         } elseif ($event["event_type"] === "exam") {
-            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND studentId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['studentId']]);
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND studentId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['data_to_save']['studentId']]);
         } elseif ($event["event_type"] === "admission") {
-            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND formNo=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['formNo']]);
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND formNo=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['data_to_save']['formNo']]);
         } else {
             $res->status(400)->json([
                 'code' => 'error',
