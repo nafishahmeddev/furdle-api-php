@@ -119,11 +119,23 @@ class EventController
         $active_date = date('Y-m-d');
         $timestamp = date('Y-m-d H:i:s');
 
-        // Find existing attendance
-        $attendance = DbHelper::selectOne(
-            "SELECT * FROM event_attendances WHERE event_id=? AND user_code=? ORDER BY dated DESC LIMIT 1",
-            [$event['event_id'], $code]
-        );
+        //user payload
+        $attendance = null;
+        if ($event['event_type'] === 'admin') {
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND adminId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['adminId']]);
+        } elseif ($event['event_type'] === 'student') {
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND studentId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['studentId']]);
+        } elseif ($event["event_type"] === "exam") {
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND studentId=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['studentId']]);
+        } elseif ($event["event_type"] === "admission") {
+            $attendance = DbHelper::selectOne("SELECT * FROM event_attendances WHERE event_id=? AND formNo=? ORDER BY dated DESC LIMIT 1", [$event['event_id'], $user['formNo']]);
+        } else {
+            $res->status(400)->json([
+                'code' => 'error',
+                'message' => 'Invalid event type'
+            ]);
+            return;
+        }
 
         //return if no attendance is found and direction is exit
         if (!$attendance && $direction === 'exit') {
@@ -134,25 +146,25 @@ class EventController
             return;
         }
 
+
         // Create new attendance
         if (!$attendance) {
             $attendance = [
                 'event_id' => $event['event_id'],
-                'user_code' => $code,
                 'entry_time' => $timestamp,
                 'dated' => $active_date,
+
             ];
-            DbHelper::insert('event_attendances', $attendance);
+            DbHelper::insert('event_attendances', array_merge($attendance, $user["data_to_save"]));
         }
         // Processing Entry (Recurring check)
         elseif ($active_date !== $attendance['dated'] && $is_recurring_allowed) {
             $attendance = [
                 'event_id' => $event['event_id'],
-                'user_code' => $code,
                 'entry_time' => $timestamp,
                 'dated' => $active_date,
             ];
-            DbHelper::insert('event_attendances', $attendance);
+            DbHelper::insert('event_attendances', array_merge($attendance, $user["data_to_save"]));
         }
         // Processing Exit
         elseif ($direction === 'exit' && $active_date == $attendance['dated'] && $is_exit_allowed) {
@@ -226,11 +238,17 @@ class EventController
                     $preview[] = ["label" => "Branch", "value" => $branch["branch_name"] ?? $admin["branch_code"]];
                 }
 
-                return ["preview" => $preview];
+                return [
+                    "preview" => $preview,
+                    "data_to_save" => [
+                        "adminId" => $admin["adminId"],
+                        "branch" => $admin["branch_code"],
+                    ]
+                ];
 
             case 'student':
                 $student = DbHelper::selectOne("
-                    SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board
+                    SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board, h.historyId
                     FROM student AS s
                     INNER JOIN history AS h ON h.studentId = s.studentId
                     WHERE s.registerNo = ?
@@ -254,11 +272,18 @@ class EventController
                     ["label" => "Board", "value" => (string) $student['board']]
                 ];
 
-                return ["preview" => $preview];
+                return [
+                    "preview" => $preview,
+                    "data_to_save" => [
+                        "studentId" => $student["studentId"],
+                        "historyId" => $student["historyId"],
+                        "branch" => $student["branch"],
+                    ]
+                ];
 
             case 'exam':
                 $student = DbHelper::selectOne("
-                    SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board
+                    SELECT s.name, s.registerNo, s.branch, s.studentId, h.asession, h.class, h.board, h.historyId
                     FROM student AS s
                     INNER JOIN history AS h ON h.studentId = s.studentId
                     INNER JOIN exam_group_class_access AS egca ON egca.asession = h.asession AND egca.class = h.class AND egca.exam_group_id = ?
@@ -287,7 +312,13 @@ class EventController
 
 
                 return [
-                    "preview" => $preview
+                    "preview" => $preview,
+                    "data_to_save" => [
+                        "studentId" => $student["studentId"],
+                        "historyId" => $student["historyId"],
+                        "branch" => $student["branch"],
+                    ]
+
                 ];
 
             case 'admission':
@@ -346,6 +377,9 @@ class EventController
                         ['label' => 'Name', 'value' => (string) $studentData['student_name']],
                         ["label" => "Form no", "value" => (string) $studentData['form_no']],
                         ['label' => 'Class', 'value' => (string) $studentData['class_name']]
+                    ],
+                    "data_to_save" => [
+                        "formNo" => $studentData['form_no'],
                     ]
                 ];
 
