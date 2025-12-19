@@ -157,7 +157,7 @@ class EventController
 
             ];
             DbHelper::insert('event_attendances', array_merge($attendance, $user["data_to_save"]));
-            $status = "ENTRY_SUCCESS";
+            $status = "checked_in";
         }
         // Processing Entry (Recurring check)
         elseif ($active_date !== $attendance['dated'] && $is_recurring_allowed) {
@@ -167,7 +167,7 @@ class EventController
                 'dated' => $active_date,
             ];
             DbHelper::insert('event_attendances', array_merge($attendance, $user["data_to_save"]));
-            $status = "ENTRY_SUCCESS";
+            $status = "checked_in";
         }
         // Processing Exit
         elseif ($direction === 'exit' && $active_date == $attendance['dated'] && $is_exit_allowed) {
@@ -178,11 +178,11 @@ class EventController
                 [$attendance['event_attendance_id']]
             );
             $attendance['exit_time'] = $timestamp;
-            $status = "EXIT_SUCCESS";
+            $status = "checked_out";
         } else if ($active_date == $attendance['dated']) {
             $is_already_marked = true;
             $can_exit = $is_exit_allowed && @$attendance['exit_time'] === null;
-            $status = "DUPLICATE_ENTRY";
+            $status = "already_marked";
         } else {
             $res->status(400)->json([
                 'code' => 'error',
