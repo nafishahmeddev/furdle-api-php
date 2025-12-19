@@ -19,16 +19,6 @@ export default function DownloadPage() {
                     </button>
                 </div>
 
-                <div className="divider">OR</div>
-
-                <p className="text-sm text-base-content/60">
-                    Scan the QR code to download directly
-                </p>
-
-                {/* Placeholder for QR Code */}
-                <div className="w-32 h-32 bg-base-200 mx-auto rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-base-content/40">QR Code</span>
-                </div>
             </div>
         </div>
     );
