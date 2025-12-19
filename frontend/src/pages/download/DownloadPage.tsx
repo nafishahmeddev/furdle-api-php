@@ -10,7 +10,7 @@ export default function DownloadPage() {
 
                 <div className="flex flex-col gap-4">
                     <a
-                        href="/download/android-furdle-v1.0.0.apk"
+                        href="/releases/android-furdle-v1.0.0.apk"
                         download
                         className="btn btn-primary btn-lg w-full"
                     >
