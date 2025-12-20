@@ -32,7 +32,7 @@ class FaceApiHelper
   {
     try {
       $client = self::getClient();
-      $response = $client->post("/api/rest/client-token", [
+      $response = $client->post("/v1/rest/client-token", [
         'json' => ['code' => 'ORG1']
       ]);
 
