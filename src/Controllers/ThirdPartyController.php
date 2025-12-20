@@ -95,7 +95,7 @@ class ThirdPartyController
             "image" => $student["image"]
           ],
           "admission_exam_session_id" => $admission_exam_session_id,
-          "url" => 'https://face.nafish.me/api/edge',
+          "url" => 'https://api.idexa.app/v1/edge',
           "token" => $faceToken,
           "query" => [
             "type" => "admission",

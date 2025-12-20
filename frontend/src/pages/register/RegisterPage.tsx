@@ -85,7 +85,7 @@ function RegisterPage() {
 
   useEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
-      if (event.origin === 'https://face.nafish.me') {
+      if (event.origin === 'https://idexa.app') {
         if (event.data.type === 'resize' && event.data.height) {
           setIframeHeight(event.data.height + 'px');
         } else if (event.data.type === 'face-confirmed' && event.data.payload && event.data.payload.image) {
@@ -318,7 +318,7 @@ function RegisterPage() {
                   <iframe
                     id="captureFrame"
                     ref={iframeRef}
-                    src="https://face.nafish.me/frame/capture"
+                    src="https://idexa.app/frame/capture"
                     className="w-full border-0"
                     style={{ height: iframeHeight }}
                     onLoad={() => {
