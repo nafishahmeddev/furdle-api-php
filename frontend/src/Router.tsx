@@ -1,9 +1,11 @@
 
 import { BrowserRouter, Routes, Route } from "react-router";
 import React, { Suspense } from "react";
+import MainLayout from "./components/layout/MainLayout";
 const HomePage = React.lazy(() => import("./pages/home/HomePage"));
 const RegisterPage = React.lazy(() => import("./pages/register/RegisterPage"));
 const DownloadPage = React.lazy(() => import("./pages/download/DownloadPage"));
+const PrivacyPage = React.lazy(() => import("./pages/privacy/PrivacyPage"));
 const NotFoundPage = React.lazy(() => import("./pages/__404"));
 
 function LoadingFallback() {
@@ -22,10 +24,13 @@ export default function Router() {
     <BrowserRouter>
       <Suspense fallback={<LoadingFallback />}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/download" element={<DownloadPage />} />
+            <Route path="/furdle/privacy" element={<PrivacyPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/download" element={<DownloadPage />} />
-          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
