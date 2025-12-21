@@ -12,7 +12,7 @@ export default function Footer() {
                             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                                 <Icon icon="hugeicons:camera-01" className="text-2xl text-primary" />
                             </div>
-                            <span className="font-bold text-xl text-base-content">Al-Ameen Face</span>
+                            <span className="font-bold text-xl text-base-content">Al-Ameen Furdle</span>
                         </div>
                         <p className="text-base-content/60 text-sm leading-relaxed max-w-sm mb-6">
                             Official internal tool for Al-Ameen Mission identity verification and attendance management.
@@ -57,11 +57,11 @@ export default function Footer() {
                 <div className="pt-8 border-t border-base-200">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-sm text-base-content/40">
-                            © {new Date().getFullYear()} Al-Ameen Face Recognition. All rights reserved.
+                            © {new Date().getFullYear()} Al-Ameen Furdle. All rights reserved.
                         </p>
                         <div className="flex items-center gap-2 text-sm text-base-content/40">
                             <span>Powered by</span>
-                            <span className="font-semibold text-primary">Furdle</span>
+                            <span className="font-semibold text-primary">Idexa</span>
                         </div>
                     </div>
                 </div>

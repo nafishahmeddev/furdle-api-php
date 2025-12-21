@@ -372,13 +372,13 @@ function RegisterPage() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-center items-center mb-4 max-sm:mb-3">
             <Icon icon="hugeicons:camera-01" className="text-2xl max-sm:text-xl text-primary mr-2" />
-            <span className="font-bold text-lg max-sm:text-base text-base-content">Al-Ameen Face</span>
+            <span className="font-bold text-lg max-sm:text-base text-base-content">Al-Ameen Furdle</span>
           </div>
           <p className="text-base-content/50 text-sm max-sm:text-xs mb-2 max-sm:mb-1">
-            Powered by <span className="font-semibold text-primary">Furdle</span> • Advanced Biometric Solutions
+            Powered by <span className="font-semibold text-primary">Idexa</span> • Advanced Biometric Solutions
           </p>
           <p className="text-base-content/40 text-xs max-sm:text-[10px]">
-            © 2025 Al-Ameen Face Recognition System. All rights reserved.
+            © 2025 Al-Ameen Furdle. All rights reserved.
           </p>
         </div>
       </footer>

@@ -17,7 +17,7 @@ export default function Header() {
                         </div>
                         <div className="flex flex-col">
                             <span className="font-bold text-lg leading-tight text-base-content">Al-Ameen</span>
-                            <span className="text-xs font-medium text-primary tracking-wide">Face Recognition</span>
+                            <span className="text-xs font-medium text-primary tracking-wide">Furdle</span>
                         </div>
                     </Link>
 
@@ -26,8 +26,8 @@ export default function Header() {
                         <Link
                             to="/"
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive('/')
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-base-content/70 hover:bg-base-200 hover:text-base-content'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-base-content/70 hover:bg-base-200 hover:text-base-content'
                                 }`}
                         >
                             Home
@@ -35,8 +35,8 @@ export default function Header() {
                         <Link
                             to="/download"
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActive('/download')
-                                    ? 'bg-primary/10 text-primary'
-                                    : 'text-base-content/70 hover:bg-base-200 hover:text-base-content'
+                                ? 'bg-primary/10 text-primary'
+                                : 'text-base-content/70 hover:bg-base-200 hover:text-base-content'
                                 }`}
                         >
                             Download

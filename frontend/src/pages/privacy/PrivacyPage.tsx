@@ -12,7 +12,7 @@ export default function PrivacyPage() {
           </div>
           <h1 className="text-4xl font-bold text-base-content mb-4">Privacy Policy</h1>
           <p className="text-lg text-base-content/60 max-w-2xl mx-auto">
-            Internal usage guidelines and data protection standards for the Al-Ameen Mission Face Recognition System.
+            Internal usage guidelines and data protection standards for the Al-Ameen Furdle System.
           </p>
           <div className="mt-6 inline-flex items-center px-4 py-2 bg-warning/10 rounded-full border border-warning/20">
             <Icon icon="hugeicons:lock-01" className="text-lg text-warning mr-2" />

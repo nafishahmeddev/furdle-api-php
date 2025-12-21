@@ -13,7 +13,7 @@ export default function HomePage() {
             </div>
             <h1 className="text-6xl font-bold text-base-content mb-6 leading-tight">
               Al-Ameen
-              <span className="block text-primary">Face Recognition</span>
+              <span className="block text-primary">Furdle</span>
             </h1>
             <p className="text-xl text-base-content/70 max-w-3xl mx-auto leading-relaxed mb-8">
               Internal identity verification system for student attendance and access control.
