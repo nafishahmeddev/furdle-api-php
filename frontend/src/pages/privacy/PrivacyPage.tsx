@@ -7,8 +7,8 @@ export default function PrivacyPage() {
 
         {/* Simple Header */}
         <div className="mb-12 border-b border-base-200 pb-8">
-          <h1 className="text-3xl font-bold text-base-content mb-2">Privacy Policy</h1>
-          <p className="text-base-content/60">
+          <h1 className="text-4xl font-bold text-base-content mb-3">Privacy Policy</h1>
+          <p className="text-lg text-base-content/60">
             Last Updated: {new Date().toLocaleDateString()}
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
           {/* Section 3: Data Retention & Deletion */}
           <section>
             <div className="flex items-center gap-3 mb-4">
-              <Icon icon="hugeicons:time-quarter-past" className="text-2xl text-warning" />
+              <Icon icon="hugeicons:clock-01" className="text-2xl text-warning" />
               <h2 className="text-xl font-bold text-base-content">3. Data Retention & Deletion</h2>
             </div>
             <div className="pl-9">
